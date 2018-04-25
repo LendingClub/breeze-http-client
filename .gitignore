@@ -1,0 +1,30 @@
+# Per-user git files. #
+git.properties
+
+# pom upgrade #
+*.xml.bak
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+# Build directories #
+target
+
+# eclipse #
+.classpath
+.settings
+.project
+.checkstyle
+*.log
+out
+*.bak
+
+# idea #
+.idea/*
+!.idea/checkstyle-idea.xml
+*.iml
+
+.DS_Store
+pom.xml.versionsBackup
