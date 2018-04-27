@@ -71,6 +71,8 @@ Person person = client.request("https://api.persons.com/persons/create")
     .post(Person.class);
 ```
 
+### Error Handling
+
 By default, HTTP 4xx/5xx responses result in an exception that includes the response, with the body available as a string; but this is configurable and you can specify the error response body Java class it should try to convert it to:
 
 ```java
@@ -81,13 +83,40 @@ try {
 }
 ```
 
+Generally, Breeze will throw `BreezeHttpResponseException` if the client received an HTTP response with status code other than 2xx; or BreezeHttpException for any other error executing the request.
+
+### Logging
+
 Breeze logs all requests by default, though you can configure it to use a given Logger class, or to not log at all. It's relatively smart about logging; it includes the timing, response code, whether it was a network error (true if there was an `IOException` somewhere inside the stack trace), and the request object. The logged request includes the names, but not the values, of all the path/query variables and the HTTP headers.
 
-Breeze is easy to extend. It's just an interface with an abstract implementation that lets you worry about implementing only the generic execute method. It also has the concept of filters and decorators.
+## Extending Breeze
 
-Filters are executed before the request executes and allow you to configure request defaults or do anything else; see `BreezeHttpFilter` and `UserAgentRequestFilter` as an example.
+Breeze is easy to extend. It's just an interface with an abstract implementation that lets you worry about implementing only the generic execute method. `AbstractBreezeHttpClient` is designed to be overridden, as are the current existing implementations, so you can easily customize them.
 
-Decorators are powerful; they are a full decorator pattern that allow you to decorate your client instance any way you want. You can nest decorators; at Lending Club we use nested decorators to provide Graphite metrics, automatic retries, and Hystrix integration. Check out `RetryDecorator` and `EndpointDecorator`.
+Breeze also has the concept of filters and decorators.
+
+### Filters
+
+Filters are executed before the request executes and allow you to configure request defaults or do anything else; see the `BreezeHttpFilter` interface and `UserAgentRequestFilter`, which sets "BreezeHttp" as the User-Agent, as an example.
+
+### Decorators
+
+Decorators are powerful; they are a full decorator pattern that allow you to decorate your client instance any way you want. You can nest decorators; at Lending Club we use nested decorators to provide Graphite metrics, automatic retries, and Hystrix integration.
+
+Here's an example of decorating an existing `BreezeHttpClient` instance to retry 100ms, 250ms, then 500ms before giving up and throwing an exception:
+
+```java
+BreezeHttpClient retryClient = new RetryDecorator(100, 250, 500).decorate(client);
+```
+
+Notice there are two classes involved in writing the decorator:
+
+1. The decorated BreezeHttpClient class, which will subclass `AbstractDecoratedClient` and must implement the `decorate` method; this is what `RetryDecorator.decorate` returns
+1. A decorator class that takes an existing `BreezeHttpClient` instance, and decorates it with its given parameters
+
+In our example, `RetryDecorator(100, 250, 500)` returns a decorator instance (not a client instance) that can decorate other clients. The result of calling `decorate` returns a client instance that does whatever the decorator wants first (in this case, try/catch/retry), and delegates anything else to the original client instance it decorated.
+
+Also see `EndpointDecorator`, which is used to set default URLs.
 
 ### License
 
