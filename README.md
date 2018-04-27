@@ -1,22 +1,28 @@
 # breeze-http-client
 
-BreezeHttpClient is an HTTP/REST client interface with plugglable implementions. It is designed to be super easy to use, extensible, and easy to configure.
+BreezeHttpClient is a fluent HTTP/REST client interface with plugglable implementions. It is designed to be super easy to use, extensible, and easy to configure.
 
-BreezeHttpClient itself is simply a Java interface for all the common HTTP verbs: GET, PUT, POST, PATCH, and a generic execute method; think `java.util.logging` but for HTTP. You write your client code around the interface and you can change implementations without touching a line of code. Breeze doesn't introduce any new dependencies on your code; in fact dependency madness is the reason it was created. If your implementation doesn't suit you, just import a new implementation, and use a client instance constructed from that implementation. The rest of your code stays the same.
+BreezeHttpClient itself is simply a Java interface for all the common HTTP verbs: GET, PUT, POST, PATCH, and a generic execute method; think `java.util.logging` but for HTTP. You write your client code around the interface and you can change implementations without touching a line of code. Breeze doesn't introduce any new dependencies on your code, as the core module is pure Java without additional libraries; in fact dependency madness (the tangled mess of conflicting dependencies created when you import multiple large, complex libraries) is the reason it was created. If your implementation doesn't suit you, just import a new implementation, and use a client instance constructed from that implementation. The rest of your code stays the same.
 
-Here are a few examples. First, pick an implementation: Spring RestTemplate or JAX-RS Jersey. (You can write your own for say HttpClient in a couple hours.) Let's say RestTemplate; the constructor is the only thing that changes throughout these examples. Note that the RestTemplate implementation comes with a very handy `BreezeHttpRestTemplateClientBuilder` with lots of flexibility in building your client instance.
+## Using BreezeHttpClient
+
+### Construction
+
+First, pick an implementation: Spring RestTemplate or JAX-RS Jersey. (You can write your own for say Apache `HttpClient` in a couple hours.) We'll use RestTemplate; the constructor is the only thing that changes throughout these examples. Note that the RestTemplate implementation comes with a very handy `BreezeHttpRestTemplateClientBuilder` with lots of flexibility in building your client instance.
 
 ```java
 BreezeHttpClient client = new BreezeHttpRestTemplateClient();
 ```
 
-Here's how you do a GET:
+### Basic HTTP commands
+
+Here's how you do a GET; note that by default all requests have JSON content type unless you specify otherwise:
 
 ```java
 Person person = client.request(url).get(Person.class);
 ```
 
-Or a POST/PUT:
+Or POST/PUT:
 
 ```java
 person = client.request(url).post(Person.class, person);
@@ -35,7 +41,7 @@ Person person = client.request("https://api.persons.com/persons/get/{id}")
     .get(Person.class);
 ```
 
-Parameterized types:
+Generic types such as Lists or Maps, using `BreezeHttpType`, the equivalent of Gson's `TypeToken` or Spring's `ParameterizedTypeReference`:
 
 ```java
 List<Person> persons = client.request("https://api.persons.com/persons/find/firstName/{firstName}")
@@ -75,7 +81,7 @@ try {
 }
 ```
 
-Breeze logs all requests by default, though you can configure it to use a given Logger class, or to not log at all. It's relatively smart about logging; it includes the timing, response code, whether it was a network error (true if there was an IOException`` somewhere inside the stack trace), and the request object. The logged request includes the names, but not the values, of all the path/query variables and the HTTP headers.
+Breeze logs all requests by default, though you can configure it to use a given Logger class, or to not log at all. It's relatively smart about logging; it includes the timing, response code, whether it was a network error (true if there was an `IOException` somewhere inside the stack trace), and the request object. The logged request includes the names, but not the values, of all the path/query variables and the HTTP headers.
 
 Breeze is easy to extend. It's just an interface with an abstract implementation that lets you worry about implementing only the generic execute method. It also has the concept of filters and decorators.
 
