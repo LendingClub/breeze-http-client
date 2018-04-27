@@ -1,22 +1,28 @@
 # breeze-http-client
 
-BreezeHttpClient is an HTTP/REST client interface with plugglable implementions. It is designed to be super easy to use, extensible, and easy to configure.
+BreezeHttpClient is a fluent HTTP/REST client interface with plugglable implementions. It is designed to be super easy to use, extensible, and easy to configure.
 
-BreezeHttpClient itself is simply a Java interface for all the common HTTP verbs: GET, PUT, POST, PATCH, and a generic execute method; think `java.util.logging` but for HTTP. You write your client code around the interface and you can change implementations without touching a line of code. Breeze doesn't introduce any new dependencies on your code; in fact dependency madness is the reason it was created. If your implementation doesn't suit you, just import a new implementation, and use a client instance constructed from that implementation. The rest of your code stays the same.
+BreezeHttpClient itself is simply a Java interface for all the common HTTP verbs: GET, PUT, POST, PATCH, and a generic execute method; think `java.util.logging` but for HTTP. You write your client code around the interface and you can change implementations without touching a line of code. Breeze doesn't introduce any new dependencies on your code, as the core module is pure Java without additional libraries; in fact dependency madness (the tangled mess of conflicting dependencies created when you import multiple large, complex libraries) is the reason it was created. If your implementation doesn't suit you, just import a new implementation, and use a client instance constructed from that implementation. The rest of your code stays the same.
 
-Here are a few examples. First, pick an implementation: Spring RestTemplate or JAX-RS Jersey. (You can write your own for say HttpClient in a couple hours.) Let's say RestTemplate; the constructor is the only thing that changes throughout these examples. Note that the RestTemplate implementation comes with a very handy `BreezeHttpRestTemplateClientBuilder` with lots of flexibility in building your client instance.
+## Using BreezeHttpClient
+
+### Construction
+
+First, pick an implementation: Spring RestTemplate or JAX-RS Jersey. (You can write your own for say Apache `HttpClient` in a couple hours.) We'll use RestTemplate; the constructor is the only thing that changes throughout these examples. Note that the RestTemplate implementation comes with a very handy `BreezeHttpRestTemplateClientBuilder` with lots of flexibility in building your client instance.
 
 ```java
 BreezeHttpClient client = new BreezeHttpRestTemplateClient();
 ```
 
-Here's how you do a GET:
+### Basic HTTP commands
+
+Here's how you do a GET; note that by default all requests have JSON content type unless you specify otherwise:
 
 ```java
 Person person = client.request(url).get(Person.class);
 ```
 
-Or a POST/PUT:
+Or POST/PUT:
 
 ```java
 person = client.request(url).post(Person.class, person);
@@ -35,7 +41,7 @@ Person person = client.request("https://api.persons.com/persons/get/{id}")
     .get(Person.class);
 ```
 
-Parameterized types:
+Generic types such as Lists or Maps, using `BreezeHttpType`, the equivalent of Gson's `TypeToken` or Spring's `ParameterizedTypeReference`:
 
 ```java
 List<Person> persons = client.request("https://api.persons.com/persons/find/firstName/{firstName}")
@@ -65,6 +71,8 @@ Person person = client.request("https://api.persons.com/persons/create")
     .post(Person.class);
 ```
 
+### Error Handling
+
 By default, HTTP 4xx/5xx responses result in an exception that includes the response, with the body available as a string; but this is configurable and you can specify the error response body Java class it should try to convert it to:
 
 ```java
@@ -75,13 +83,40 @@ try {
 }
 ```
 
-Breeze logs all requests by default, though you can configure it to use a given Logger class, or to not log at all. It's relatively smart about logging; it includes the timing, response code, whether it was a network error (true if there was an IOException`` somewhere inside the stack trace), and the request object. The logged request includes the names, but not the values, of all the path/query variables and the HTTP headers.
+Generally, Breeze will throw `BreezeHttpResponseException` if the client received an HTTP response with status code other than 2xx; or BreezeHttpException for any other error executing the request.
 
-Breeze is easy to extend. It's just an interface with an abstract implementation that lets you worry about implementing only the generic execute method. It also has the concept of filters and decorators.
+### Logging
 
-Filters are executed before the request executes and allow you to configure request defaults or do anything else; see `BreezeHttpFilter` and `UserAgentRequestFilter` as an example.
+Breeze logs all requests by default, though you can configure it to use a given Logger class, or to not log at all. It's relatively smart about logging; it includes the timing, response code, whether it was a network error (true if there was an `IOException` somewhere inside the stack trace), and the request object. The logged request includes the names, but not the values, of all the path/query variables and the HTTP headers.
 
-Decorators are powerful; they are a full decorator pattern that allow you to decorate your client instance any way you want. You can nest decorators; at Lending Club we use nested decorators to provide Graphite metrics, automatic retries, and Hystrix integration. Check out `RetryDecorator` and `EndpointDecorator`.
+## Extending Breeze
+
+Breeze is easy to extend. It's just an interface with an abstract implementation that lets you worry about implementing only the generic execute method. `AbstractBreezeHttpClient` is designed to be overridden, as are the current existing implementations, so you can easily customize them.
+
+Breeze also has the concept of filters and decorators.
+
+### Filters
+
+Filters are executed before the request executes and allow you to configure request defaults or do anything else; see the `BreezeHttpFilter` interface and `UserAgentRequestFilter`, which sets "BreezeHttp" as the User-Agent, as an example.
+
+### Decorators
+
+Decorators are powerful; they are a full decorator pattern that allow you to decorate your client instance any way you want. You can nest decorators; at Lending Club we use nested decorators to provide Graphite metrics, automatic retries, and Hystrix integration.
+
+Here's an example of decorating an existing `BreezeHttpClient` instance to retry 100ms, 250ms, then 500ms before giving up and throwing an exception:
+
+```java
+BreezeHttpClient retryClient = new RetryDecorator(100, 250, 500).decorate(client);
+```
+
+Notice there are two classes involved in writing the decorator:
+
+1. The decorated BreezeHttpClient class, which will subclass `AbstractDecoratedClient` and must implement the `decorate` method; this is what `RetryDecorator.decorate` returns
+1. A decorator class that takes an existing `BreezeHttpClient` instance, and decorates it with its given parameters
+
+In our example, `RetryDecorator(100, 250, 500)` returns a decorator instance (not a client instance) that can decorate other clients. The result of calling `decorate` returns a client instance that does whatever the decorator wants first (in this case, try/catch/retry), and delegates anything else to the original client instance it decorated.
+
+Also see `EndpointDecorator`, which is used to set default URLs.
 
 ### License
 
