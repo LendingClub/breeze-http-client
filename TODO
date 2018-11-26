@@ -1,0 +1,12 @@
+* Passthrough request/response body "native" to client implementation
+  - OkHttp Request/Response and ResponseBody, Call object from newCall
+  - RestTemplate ClientHttpResponse/HttpEntity/ClientHttpResponse/ResponseEntity
+* Better testing of InputStream
+  - We close underlying response whether it's a stream or not
+  - Exceptions leave stream open until the outer layer translates the exception or if not, closes it
+  - AbstractInvokingDude converts non-Breeze exceptions
+* Allow encoded path/query variables?
+
+* what to say about OkHttp3 posting input streams (not supported because redirects/retries)
+
+* Request.convertedBody
