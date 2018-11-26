@@ -38,8 +38,9 @@
 
         <property name="basedir" value="${basedir}"/>
     -->
-
     <property name="fileExtensions" value="java, xml"/>
+
+    <module name="SuppressionCommentFilter"/>
 
     <!-- Checks that a package-info.java file exists for each package.     -->
     <!-- See http://checkstyle.sf.net/config_javadoc.html#JavadocPackage -->
@@ -86,7 +87,9 @@
         <!--<module name="JavadocMethod"/>-->
         <!--<module name="JavadocType"/>-->
         <!--<module name="JavadocVariable"/>-->
-        <module name="JavadocStyle"/>
+        <module name="JavadocStyle">
+            <property name="checkFirstSentence" value="false"/>
+        </module>
 
         <!-- Checks for Naming Conventions.                  -->
         <!-- See http://checkstyle.sf.net/config_naming.html -->
@@ -130,7 +133,13 @@
         <module name="ParenPad"/>
         <module name="TypecastParenPad"/>
         <module name="WhitespaceAfter"/>
-        <module name="WhitespaceAround"/>
+        <module name="WhitespaceAround">
+            <property name="allowEmptyMethods" value="true"/>
+            <property name="allowEmptyConstructors" value="true"/>
+            <property name="allowEmptyLoops" value="true"/>
+            <property name="allowEmptyTypes" value="true"/>
+            <property name="allowEmptyLambdas" value="true"/>
+        </module>
 
         <!-- Modifier Checks                                    -->
         <!-- See http://checkstyle.sf.net/config_modifiers.html -->
