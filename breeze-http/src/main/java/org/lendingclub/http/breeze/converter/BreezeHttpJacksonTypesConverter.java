@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import static org.lendingclub.http.breeze.BreezeHttpType.isSubclass;
 import static org.lendingclub.http.breeze.util.BreezeHttpUtil.cast;
 
-public class BreezeHttpJacksonTypesConverter implements BreezeHttpBodyConverter {
+public class BreezeHttpJacksonTypesConverter implements BreezeHttpConverter {
     protected final BreezeHttpJsonMapper jacksonMapper;
 
     public BreezeHttpJacksonTypesConverter() {
@@ -25,7 +25,7 @@ public class BreezeHttpJacksonTypesConverter implements BreezeHttpBodyConverter 
     }
 
     @Override
-    public boolean convert(BreezeHttpRequest request) {
+    public boolean convertRequestBody(BreezeHttpRequest request) {
         Object body = request.body();
         if (body != null && isJacksonNode(body.getClass())) {
             request.body(body.toString());
@@ -34,7 +34,7 @@ public class BreezeHttpJacksonTypesConverter implements BreezeHttpBodyConverter 
     }
 
     @Override
-    public <T> BreezeHttpResponse<T> convert(BreezeHttpRequest request, BreezeHttpRawResponse raw, Type type) {
+    public <T> BreezeHttpResponse<T> convertResponse(BreezeHttpRawResponse raw, Type type) {
         if (isJacksonNode(type)) {
             return cast(new BreezeHttpResponse<>(jacksonMapper.parse(raw.body()), raw));
         } else {

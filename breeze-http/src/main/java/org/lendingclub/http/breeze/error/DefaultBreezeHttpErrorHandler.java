@@ -1,7 +1,6 @@
 package org.lendingclub.http.breeze.error;
 
-import org.lendingclub.http.breeze.converter.BreezeHttpBodyConverter;
-import org.lendingclub.http.breeze.exception.BreezeHttpResponseException;
+import org.lendingclub.http.breeze.exception.BreezeHttpException;
 import org.lendingclub.http.breeze.request.BreezeHttpRequest;
 import org.lendingclub.http.breeze.response.BreezeHttpRawResponse;
 import org.lendingclub.http.breeze.response.BreezeHttpResponse;
@@ -12,7 +11,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static java.util.Arrays.asList;
-import static org.lendingclub.http.breeze.exception.BreezeHttpResponseException.create;
 
 public class DefaultBreezeHttpErrorHandler implements BreezeHttpErrorHandler {
     protected final Set<Integer> errorStatuses = new HashSet<>();
@@ -46,17 +44,15 @@ public class DefaultBreezeHttpErrorHandler implements BreezeHttpErrorHandler {
 
     @Override
     public void handleError(BreezeHttpRequest request, BreezeHttpRawResponse raw) {
-        BreezeHttpResponseException exception;
+        BreezeHttpResponse<?> response = null;
+        Throwable error = null;
+
         try {
-            BreezeHttpResponse<?> response = BreezeHttpBodyConverter.convertResponse(
-                    request,
-                    raw,
-                    errorResponseBodyType
-            );
-            exception = create(request, response);
+            response = raw.convertResponse(errorResponseBodyType);
         } catch (Throwable t) {
-            throw create(request, new BreezeHttpResponse<>(null, raw), t);
+            error = t;
         }
-        throw exception;
+
+        throw BreezeHttpException.create(request, raw, response, error);
     }
 }

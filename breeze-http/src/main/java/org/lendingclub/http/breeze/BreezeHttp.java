@@ -1,6 +1,6 @@
 package org.lendingclub.http.breeze;
 
-import org.lendingclub.http.breeze.converter.BreezeHttpBodyConverter;
+import org.lendingclub.http.breeze.converter.BreezeHttpConverter;
 import org.lendingclub.http.breeze.decorator.BreezeHttpDecorator;
 import org.lendingclub.http.breeze.error.BreezeHttpErrorHandler;
 import org.lendingclub.http.breeze.exception.BreezeHttpException;
@@ -210,7 +210,7 @@ public interface BreezeHttp {
     BreezeHttpErrorHandler errorHandler();
 
     /** List of body converters configured for this client. */
-    List<BreezeHttpBodyConverter> converters();
+    List<BreezeHttpConverter> converters();
 
     /** List of request filters configured for this client. */
     List<BreezeHttpFilter> filters();

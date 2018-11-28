@@ -2,7 +2,7 @@ package org.lendingclub.http.breeze.client.jaxrs;
 
 import org.lendingclub.http.breeze.client.AbstractInvokingBreezeHttpClient;
 import org.lendingclub.http.breeze.client.jaxrs.response.BreezeHttpJaxRsRawResponse;
-import org.lendingclub.http.breeze.converter.BreezeHttpBodyConverter;
+import org.lendingclub.http.breeze.converter.BreezeHttpConverter;
 import org.lendingclub.http.breeze.error.BreezeHttpErrorHandler;
 import org.lendingclub.http.breeze.filter.BreezeHttpFilter;
 import org.lendingclub.http.breeze.logging.BreezeHttpRequestLogger;
@@ -31,7 +31,7 @@ public abstract class BreezeHttpJaxRsClient extends AbstractInvokingBreezeHttpCl
 
     public BreezeHttpJaxRsClient(
             BreezeHttpRequestLogger requestLogger,
-            Collection<BreezeHttpBodyConverter> converters,
+            Collection<BreezeHttpConverter> converters,
             Collection<BreezeHttpFilter> filters,
             BreezeHttpErrorHandler errorHandler
     ) {
@@ -49,7 +49,7 @@ public abstract class BreezeHttpJaxRsClient extends AbstractInvokingBreezeHttpCl
         if (request.bufferResponse()) {
             response.bufferEntity();
         }
-        return new BreezeHttpJaxRsRawResponse(request.conversionType(), response);
+        return new BreezeHttpJaxRsRawResponse(request, response);
     }
 
     protected SyncInvoker buildInvoker(BreezeHttpRequest request) {

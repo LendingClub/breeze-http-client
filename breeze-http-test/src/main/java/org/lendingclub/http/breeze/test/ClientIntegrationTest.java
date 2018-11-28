@@ -7,7 +7,7 @@ import org.lendingclub.http.breeze.decorator.BreezeHttpRequestDefaultsDecorator;
 import org.lendingclub.http.breeze.decorator.BreezeHttpRetryDecorator;
 import org.lendingclub.http.breeze.exception.BreezeHttpClientErrorException;
 import org.lendingclub.http.breeze.exception.BreezeHttpException;
-import org.lendingclub.http.breeze.exception.BreezeHttpIOException;
+import org.lendingclub.http.breeze.exception.BreezeHttpExecutionException;
 import org.lendingclub.http.breeze.exception.BreezeHttpResponseException;
 import org.lendingclub.http.breeze.exception.BreezeHttpServerErrorException;
 import org.lendingclub.http.breeze.filter.BreezeHttpDetailLoggingFilter;
@@ -351,15 +351,19 @@ public class ClientIntegrationTest {
 
             if (response.isSuccess()) {
                 assertEquals(200, response.httpStatus());
-                assertEquals(expected, response.convert(new BreezeHttpType<Map<String, List<TestModel>>>() {}.type()));
+                assertEquals(
+                        expected,
+                        response.convertResponse(new BreezeHttpType<Map<String, List<TestModel>>>() {}.type()).body()
+                );
             } else if (response.isError()) {
-                ErrorResponse errorResponse = response.convert(ErrorResponse.class);
-                assertEquals(response.httpStatus(), errorResponse.getCode());
-                assertEquals(response.isClientError() ? "clientError" : "serverError", errorResponse.getMessage());
+                BreezeHttpResponse<ErrorResponse> errorResponse = response.convertResponse(ErrorResponse.class);
+                ErrorResponse error = errorResponse.body();
+                assertEquals(response.httpStatus(), error.getCode());
+                assertEquals(response.isClientError() ? "clientError" : "serverError", error.getMessage());
             }
 
             try {
-                response.convert(new BreezeHttpType<Map<String, List<TestModel>>>() {}.type());
+                response.convertResponse(new BreezeHttpType<Map<String, List<TestModel>>>() {}.type());
                 fail("should not be able to read input stream twice");
             } catch (Exception e) {
                 // expected
@@ -383,15 +387,19 @@ public class ClientIntegrationTest {
 
             if (raw.isSuccess()) {
                 assertEquals(200, raw.httpStatus());
-                assertEquals(expected, raw.convert(new BreezeHttpType<Map<String, List<TestModel>>>() {}.type()));
+                assertEquals(
+                        expected,
+                        raw.convertResponse(new BreezeHttpType<Map<String, List<TestModel>>>() {}.type()).body()
+                );
             } else if (raw.isError()) {
-                ErrorResponse errorResponse = raw.convert(ErrorResponse.class);
-                assertEquals(raw.httpStatus(), errorResponse.getCode());
-                assertEquals(raw.isClientError() ? "clientError" : "serverError", errorResponse.getMessage());
+                BreezeHttpResponse<ErrorResponse> errorResponse = raw.convertResponse(ErrorResponse.class);
+                ErrorResponse error = errorResponse.body();
+                assertEquals(raw.httpStatus(), error.getCode());
+                assertEquals(raw.isClientError() ? "clientError" : "serverError", error.getMessage());
             }
 
             try {
-                raw.convert(new BreezeHttpType<Map<String, List<TestModel>>>() {}.type());
+                raw.convertResponse(new BreezeHttpType<Map<String, List<TestModel>>>() {}.type());
                 fail("should not be able to read input stream twice");
             } catch (Exception e) {
                 // expected
@@ -669,8 +677,8 @@ public class ClientIntegrationTest {
         try {
             test.test(client, null, null);
             fail("client call should have thrown exception");
-        } catch (BreezeHttpIOException e) {
-            assertNotNull(BreezeHttpIOException.findIOExceptionCause(e));
+        } catch (BreezeHttpException e) {
+            assertNotNull(BreezeHttpException.findIOException(e));
         }
     }
 
@@ -685,8 +693,9 @@ public class ClientIntegrationTest {
             test.test(client, "pause", "1000");
             fail("request did not timeout");
         } catch (Exception e) {
-            // IOException should be wrapped in our own BreezeHttpIOException
-            assertEquals(BreezeHttpIOException.class, e.getClass());
+            // IOException should be wrapped in our own BreezeHttpExecutionException
+            assertEquals(BreezeHttpExecutionException.class, e.getClass());
+            assertNotNull(((BreezeHttpExecutionException) e).findIOException());
 
             // Make sure the client waited at least 500ms or thereabouts
             long delay = System.currentTimeMillis() - startTime;

@@ -1,7 +1,7 @@
 package org.lendingclub.http.breeze.builder;
 
 import org.lendingclub.http.breeze.BreezeHttp;
-import org.lendingclub.http.breeze.converter.BreezeHttpBodyConverter;
+import org.lendingclub.http.breeze.converter.BreezeHttpConverter;
 import org.lendingclub.http.breeze.decorator.BreezeHttpDecorator;
 import org.lendingclub.http.breeze.error.BreezeHttpErrorHandler;
 import org.lendingclub.http.breeze.error.DefaultBreezeHttpErrorHandler;
@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 public abstract class AbstractBreezeHttpClientBuilder<T> {
     protected T me;
     protected BreezeHttpRequestLogger requestLogger;
-    protected List<BreezeHttpBodyConverter> converters = new ArrayList<>();
+    protected List<BreezeHttpConverter> converters = new ArrayList<>();
     protected List<BreezeHttpFilter> filters = new ArrayList<>();
     protected List<BreezeHttpDecorator> decorators = new ArrayList<>();
     protected BreezeHttpErrorHandler errorHandler;
@@ -35,12 +35,12 @@ public abstract class AbstractBreezeHttpClientBuilder<T> {
         return me;
     }
 
-    public T converter(BreezeHttpBodyConverter converter) {
+    public T converter(BreezeHttpConverter converter) {
         this.converters.add(converter);
         return me;
     }
 
-    public T converters(Collection<BreezeHttpBodyConverter> converters) {
+    public T converters(Collection<BreezeHttpConverter> converters) {
         this.converters.addAll(converters);
         return me;
     }

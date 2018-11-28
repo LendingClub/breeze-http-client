@@ -13,10 +13,10 @@ import org.lendingclub.http.breeze.client.AbstractInvokingBreezeHttpClient;
 import org.lendingclub.http.breeze.client.json.BreezeHttpJsonMapper;
 import org.lendingclub.http.breeze.client.okhttp3.request.InputStreamRequestBody;
 import org.lendingclub.http.breeze.client.okhttp3.response.BreezeHttpOk3RawResponse;
-import org.lendingclub.http.breeze.converter.BreezeHttpBodyConverter;
+import org.lendingclub.http.breeze.converter.BreezeHttpConverter;
 import org.lendingclub.http.breeze.error.BreezeHttpErrorHandler;
 import org.lendingclub.http.breeze.exception.BreezeHttpException;
-import org.lendingclub.http.breeze.exception.BreezeHttpIOException;
+import org.lendingclub.http.breeze.exception.BreezeHttpExecutionException;
 import org.lendingclub.http.breeze.filter.BreezeHttpFilter;
 import org.lendingclub.http.breeze.logging.BreezeHttpRequestLogger;
 import org.lendingclub.http.breeze.request.BreezeHttpRequest;
@@ -45,7 +45,7 @@ public class BreezeHttpOk3Client extends AbstractInvokingBreezeHttpClient {
     public BreezeHttpOk3Client(
             OkHttpClient okClient,
             BreezeHttpRequestLogger requestLogger,
-            Collection<BreezeHttpBodyConverter> converters,
+            Collection<BreezeHttpConverter> converters,
             Collection<BreezeHttpFilter> filters,
             BreezeHttpErrorHandler errorHandler,
             BreezeHttpJsonMapper jsonMapper
@@ -67,9 +67,9 @@ public class BreezeHttpOk3Client extends AbstractInvokingBreezeHttpClient {
     protected BreezeHttpRawResponse invoke(BreezeHttpRequest request) {
         try {
             Response okResponse = okClient.newCall(createOkRequest(request)).execute();
-            return new BreezeHttpOk3RawResponse(request.conversionType(), okResponse, this, request.bufferResponse());
+            return new BreezeHttpOk3RawResponse(request, okResponse, this);
         } catch (IOException t) {
-            throw new BreezeHttpIOException(t);
+            throw new BreezeHttpExecutionException(request, t);
         }
     }
 

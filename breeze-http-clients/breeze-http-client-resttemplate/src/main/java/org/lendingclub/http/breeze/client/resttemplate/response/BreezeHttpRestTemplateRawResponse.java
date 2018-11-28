@@ -1,6 +1,7 @@
 package org.lendingclub.http.breeze.client.resttemplate.response;
 
-import org.lendingclub.http.breeze.exception.BreezeHttpIOException;
+import org.lendingclub.http.breeze.converter.BreezeHttpConverter;
+import org.lendingclub.http.breeze.exception.BreezeHttpException;
 import org.lendingclub.http.breeze.response.BreezeHttpRawResponse;
 import org.lendingclub.http.breeze.response.BreezeHttpResponseInputStream;
 import org.springframework.http.HttpHeaders;
@@ -24,11 +25,11 @@ public class BreezeHttpRestTemplateRawResponse extends BreezeHttpRawResponse {
     private final List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
 
     public BreezeHttpRestTemplateRawResponse(
-            Type conversionType,
+            List<BreezeHttpConverter> converters,
             ClientHttpResponse clientResponse,
             List<HttpMessageConverter<?>> messageConverters
     ) {
-        super(conversionType);
+        super(converters);
         this.clientResponse = clientResponse;
         this.messageConverters.addAll(messageConverters);
         clientResponse.getHeaders().forEach(this::header);
@@ -36,7 +37,7 @@ public class BreezeHttpRestTemplateRawResponse extends BreezeHttpRawResponse {
         try {
             this.httpStatus = clientResponse.getRawStatusCode();
         } catch (IOException e) {
-            throw new BreezeHttpIOException(e);
+            throw new BreezeHttpException(e);
         }
     }
 
@@ -45,7 +46,7 @@ public class BreezeHttpRestTemplateRawResponse extends BreezeHttpRawResponse {
         try {
             return new BreezeHttpResponseInputStream(clientResponse, clientResponse.getBody());
         } catch (IOException e) {
-            throw new BreezeHttpIOException(e);
+            throw new BreezeHttpException(e);
         }
     }
 
@@ -57,7 +58,7 @@ public class BreezeHttpRestTemplateRawResponse extends BreezeHttpRawResponse {
             String charset = contentType != null ? contentType.getCharset().name() : "UTF-8";
             return readString(clientResponse.getBody(), charset);
         } catch (IOException e) {
-            throw new BreezeHttpIOException(e);
+            throw new BreezeHttpException(e);
         }
     }
 
@@ -66,12 +67,12 @@ public class BreezeHttpRestTemplateRawResponse extends BreezeHttpRawResponse {
         try {
             return readBytes(clientResponse.getBody());
         } catch (IOException e) {
-            throw new BreezeHttpIOException(e);
+            throw new BreezeHttpException(e);
         }
     }
 
     @Override
-    public <T> T convert(Type type) {
+    public <T> T convertBody(Type type) {
         try {
             if (type == null || type == Void.class) {
                 return null;
@@ -81,7 +82,7 @@ public class BreezeHttpRestTemplateRawResponse extends BreezeHttpRawResponse {
                 return new HttpMessageConverterExtractor<T>(type, messageConverters).extractData(clientResponse);
             }
         } catch (IOException e) {
-            throw new BreezeHttpIOException(e);
+            throw new BreezeHttpException(e);
         }
     }
 

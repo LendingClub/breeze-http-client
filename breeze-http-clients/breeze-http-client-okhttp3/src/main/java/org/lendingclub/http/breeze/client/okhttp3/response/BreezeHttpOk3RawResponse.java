@@ -6,7 +6,7 @@ import okhttp3.ResponseBody;
 import okio.BufferedSource;
 import org.lendingclub.http.breeze.client.okhttp3.BreezeHttpOk3Client;
 import org.lendingclub.http.breeze.exception.BreezeHttpException;
-import org.lendingclub.http.breeze.exception.BreezeHttpIOException;
+import org.lendingclub.http.breeze.request.BreezeHttpRequest;
 import org.lendingclub.http.breeze.response.BreezeHttpRawResponse;
 import org.lendingclub.http.breeze.response.BreezeHttpResponseInputStream;
 
@@ -26,26 +26,21 @@ public class BreezeHttpOk3RawResponse extends BreezeHttpRawResponse {
     protected final BreezeHttpOk3Client breeze;
     protected final byte[] bufferedBody;
 
-    public BreezeHttpOk3RawResponse(
-            Type conversionType,
-            Response okResponse,
-            BreezeHttpOk3Client breeze,
-            boolean bufferResponse
-    ) {
-        super(conversionType);
+    public BreezeHttpOk3RawResponse(BreezeHttpRequest request, Response okResponse, BreezeHttpOk3Client breeze) {
+        super(breeze.converters());
         this.okResponse = okResponse;
         this.okBody = okResponse.body();
         this.breeze = breeze;
         this.httpStatus = okResponse.code();
 
         try {
-            if (bufferResponse && okBody != null) {
+            if (request.bufferResponse() && okBody != null) {
                 bufferedBody = okResponse.peekBody(Integer.MAX_VALUE).bytes();
             } else {
                 bufferedBody = null;
             }
         } catch (IOException e) {
-            throw new BreezeHttpIOException(e);
+            throw new BreezeHttpException(e);
         }
 
         okResponse.headers().toMultimap().forEach((key, values) -> header(key, new ArrayList<>(values)));
@@ -77,7 +72,7 @@ public class BreezeHttpOk3RawResponse extends BreezeHttpRawResponse {
 
             return new String(bufferedBody);
         } catch (IOException e) {
-            throw new BreezeHttpIOException(e);
+            throw new BreezeHttpException(e);
         }
     }
 
@@ -94,12 +89,12 @@ public class BreezeHttpOk3RawResponse extends BreezeHttpRawResponse {
 
             return bufferedBody;
         } catch (IOException e) {
-            throw new BreezeHttpIOException(e);
+            throw new BreezeHttpException(e);
         }
     }
 
     @Override
-    public <T> T convert(Type type) {
+    public <T> T convertBody(Type type) {
         if (type == null || type == Void.class || okBody == null) {
             return null;
         }
@@ -138,7 +133,7 @@ public class BreezeHttpOk3RawResponse extends BreezeHttpRawResponse {
 
             throw new BreezeHttpException("unable to convert response contentType=" + mediaType + " to " + type);
         } catch (IOException e) {
-            throw new BreezeHttpIOException(e);
+            throw new BreezeHttpException(e);
         }
     }
 

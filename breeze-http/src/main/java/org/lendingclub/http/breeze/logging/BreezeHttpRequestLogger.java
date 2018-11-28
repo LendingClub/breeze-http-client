@@ -4,9 +4,9 @@ import org.lendingclub.http.breeze.request.BreezeHttpRequest;
 import org.lendingclub.http.breeze.response.BreezeHttpResponse;
 
 public interface BreezeHttpRequestLogger {
-    void requestStart(BreezeHttpRequest request);
+    void start(BreezeHttpRequest request);
 
-    void requestEnd(BreezeHttpRequest request, BreezeHttpResponse<?> response);
+    void end(BreezeHttpRequest request, BreezeHttpResponse<?> response);
 
-    void requestError(BreezeHttpRequest request, Throwable t);
+    void exception(BreezeHttpRequest request, Throwable t);
 }

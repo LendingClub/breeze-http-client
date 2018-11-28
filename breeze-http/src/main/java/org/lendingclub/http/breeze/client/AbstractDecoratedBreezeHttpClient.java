@@ -1,7 +1,7 @@
 package org.lendingclub.http.breeze.client;
 
 import org.lendingclub.http.breeze.BreezeHttp;
-import org.lendingclub.http.breeze.converter.BreezeHttpBodyConverter;
+import org.lendingclub.http.breeze.converter.BreezeHttpConverter;
 import org.lendingclub.http.breeze.decorator.BreezeHttpDecorator;
 import org.lendingclub.http.breeze.decorator.DecoratedBreezeHttp;
 import org.lendingclub.http.breeze.decorator.DecoratorCommand;
@@ -63,7 +63,7 @@ public abstract class AbstractDecoratedBreezeHttpClient extends AbstractBreezeHt
     }
 
     @Override
-    public List<BreezeHttpBodyConverter> converters() {
+    public List<BreezeHttpConverter> converters() {
         return breeze.converters();
     }
 

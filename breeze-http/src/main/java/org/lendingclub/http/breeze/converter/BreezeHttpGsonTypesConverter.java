@@ -13,7 +13,7 @@ import com.google.gson.JsonElement;
 import static org.lendingclub.http.breeze.BreezeHttpType.isSubclass;
 import static org.lendingclub.http.breeze.util.BreezeHttpUtil.cast;
 
-public class BreezeHttpGsonTypesConverter implements BreezeHttpBodyConverter {
+public class BreezeHttpGsonTypesConverter implements BreezeHttpConverter {
     protected final BreezeHttpJsonMapper gsonMapper;
 
     public BreezeHttpGsonTypesConverter() {
@@ -25,7 +25,7 @@ public class BreezeHttpGsonTypesConverter implements BreezeHttpBodyConverter {
     }
 
     @Override
-    public boolean convert(BreezeHttpRequest request) {
+    public boolean convertRequestBody(BreezeHttpRequest request) {
         Object body = request.body();
         if (body != null && isGsonElement(body.getClass())) {
             request.body(body.toString());
@@ -34,7 +34,7 @@ public class BreezeHttpGsonTypesConverter implements BreezeHttpBodyConverter {
     }
 
     @Override
-    public <T> BreezeHttpResponse<T> convert(BreezeHttpRequest request, BreezeHttpRawResponse raw, Type type) {
+    public <T> BreezeHttpResponse<T> convertResponse(BreezeHttpRawResponse raw, Type type) {
         if (isGsonElement(type)) {
             return cast(new BreezeHttpResponse<>(gsonMapper.parse(raw.body()), raw));
         } else {

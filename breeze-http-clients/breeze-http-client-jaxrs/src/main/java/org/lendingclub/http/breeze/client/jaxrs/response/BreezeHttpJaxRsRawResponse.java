@@ -1,5 +1,6 @@
 package org.lendingclub.http.breeze.client.jaxrs.response;
 
+import org.lendingclub.http.breeze.request.BreezeHttpRequest;
 import org.lendingclub.http.breeze.response.BreezeHttpRawResponse;
 import org.lendingclub.http.breeze.response.BreezeHttpResponseInputStream;
 
@@ -15,8 +16,8 @@ public class BreezeHttpJaxRsRawResponse extends BreezeHttpRawResponse {
     private final Response response;
     private final boolean hasEntity;
 
-    public BreezeHttpJaxRsRawResponse(Type conversionType, Response response) {
-        super(conversionType);
+    public BreezeHttpJaxRsRawResponse(BreezeHttpRequest request, Response response) {
+        super(request.breeze().converters());
         this.response = response;
         this.hasEntity = response.hasEntity();
         this.httpStatus = response.getStatus();
@@ -40,7 +41,7 @@ public class BreezeHttpJaxRsRawResponse extends BreezeHttpRawResponse {
     }
 
     @Override
-    public <T> T convert(Type type) {
+    public <T> T convertBody(Type type) {
         if (!hasEntity || type == Void.class || type == null) {
             return null;
         }

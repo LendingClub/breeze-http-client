@@ -6,7 +6,7 @@ import org.glassfish.jersey.media.multipart.MultiPart;
 import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
 import org.glassfish.jersey.media.multipart.file.StreamDataBodyPart;
 import org.lendingclub.http.breeze.client.jaxrs.BreezeHttpJaxRsClient;
-import org.lendingclub.http.breeze.converter.BreezeHttpBodyConverter;
+import org.lendingclub.http.breeze.converter.BreezeHttpConverter;
 import org.lendingclub.http.breeze.error.BreezeHttpErrorHandler;
 import org.lendingclub.http.breeze.filter.BreezeHttpFilter;
 import org.lendingclub.http.breeze.logging.BreezeHttpRequestLogger;
@@ -31,7 +31,7 @@ public class BreezeHttpJaxRsJerseyClient extends BreezeHttpJaxRsClient {
     public BreezeHttpJaxRsJerseyClient(
             Client client,
             BreezeHttpRequestLogger requestLogger,
-            Collection<BreezeHttpBodyConverter> converters,
+            Collection<BreezeHttpConverter> converters,
             Collection<BreezeHttpFilter> filters,
             BreezeHttpErrorHandler errorHandler
     ) {

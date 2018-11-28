@@ -4,7 +4,6 @@ import org.lendingclub.http.breeze.request.BreezeHttpRequest;
 import org.lendingclub.http.breeze.response.BreezeHttpRawResponse;
 import org.lendingclub.http.breeze.response.BreezeHttpResponse;
 
-import java.util.Collection;
 import java.util.function.Predicate;
 
 /**
@@ -19,12 +18,12 @@ public interface BreezeHttpFilter {
     }
 
     /** Called when a request is first created; useful to set defaults. */
-    default boolean init(BreezeHttpRequest request) {
+    default boolean created(BreezeHttpRequest request) {
         return true;
     }
 
     /** Called when a request is about to be executed. */
-    default boolean prepare(BreezeHttpRequest request) {
+    default boolean setup(BreezeHttpRequest request) {
         return true;
     }
 
@@ -44,17 +43,13 @@ public interface BreezeHttpFilter {
     }
 
     /** Called when a request throws an exception. */
-    default boolean exception(BreezeHttpRequest request, Throwable t) {
+    default boolean exception(BreezeHttpRequest request, BreezeHttpResponse<?> response, Throwable t) {
         return true;
     }
 
-    static void invoke(
-            Collection<BreezeHttpFilter> filters,
-            BreezeHttpRequest request,
-            Predicate<BreezeHttpFilter> predicate
-    ) {
-        for (BreezeHttpFilter filter : filters) {
-            if (filter.shouldFilter(request) && !predicate.test(filter)) {
+    static void filter(BreezeHttpRequest request, Predicate<BreezeHttpFilter> filterMethod) {
+        for (BreezeHttpFilter filter : request.breeze().filters()) {
+            if (filter.shouldFilter(request) && !filterMethod.test(filter)) {
                 break;
             }
         }

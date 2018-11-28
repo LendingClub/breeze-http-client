@@ -1,13 +1,13 @@
 package org.lendingclub.http.breeze.client;
 
-import org.lendingclub.http.breeze.converter.BreezeHttpBodyConverter;
+import org.lendingclub.http.breeze.converter.BreezeHttpConverter;
 import org.lendingclub.http.breeze.converter.BreezeHttpGsonTypesConverter;
 import org.lendingclub.http.breeze.converter.BreezeHttpJacksonTypesConverter;
 import org.lendingclub.http.breeze.converter.BreezeHttpJsonPathTypesConverter;
 import org.lendingclub.http.breeze.error.BreezeHttpErrorHandler;
 import org.lendingclub.http.breeze.error.DefaultBreezeHttpErrorHandler;
-import org.lendingclub.http.breeze.exception.BreezeHttpException;
-import org.lendingclub.http.breeze.exception.BreezeHttpIOException;
+import org.lendingclub.http.breeze.exception.BreezeHttpExecutionException;
+import org.lendingclub.http.breeze.exception.BreezeHttpResponseException;
 import org.lendingclub.http.breeze.filter.BreezeHttpFilter;
 import org.lendingclub.http.breeze.logging.BreezeHttpRequestLogger;
 import org.lendingclub.http.breeze.logging.DefaultBreezeHttpRequestLogger;
@@ -18,7 +18,6 @@ import org.lendingclub.http.breeze.response.BreezeHttpRawResponse;
 import org.lendingclub.http.breeze.response.BreezeHttpResponse;
 
 import java.io.Closeable;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -31,13 +30,13 @@ import static org.lendingclub.http.breeze.util.BreezeHttpUtil.cast;
 
 public abstract class AbstractInvokingBreezeHttpClient extends AbstractBreezeHttpClient {
     protected final BreezeHttpRequestLogger requestLogger;
-    protected final List<BreezeHttpBodyConverter> converters = new ArrayList<>();
+    protected final List<BreezeHttpConverter> converters = new ArrayList<>();
     protected final List<BreezeHttpFilter> filters = new ArrayList<>();
     protected final BreezeHttpErrorHandler errorHandler;
 
     public AbstractInvokingBreezeHttpClient(
             BreezeHttpRequestLogger requestLogger,
-            Collection<BreezeHttpBodyConverter> converters,
+            Collection<BreezeHttpConverter> converters,
             Collection<BreezeHttpFilter> filters,
             BreezeHttpErrorHandler errorHandler
     ) {
@@ -64,7 +63,7 @@ public abstract class AbstractInvokingBreezeHttpClient extends AbstractBreezeHtt
     }
 
     @Override
-    public List<BreezeHttpBodyConverter> converters() {
+    public List<BreezeHttpConverter> converters() {
         return converters;
     }
 
@@ -87,43 +86,23 @@ public abstract class AbstractInvokingBreezeHttpClient extends AbstractBreezeHtt
     public <T> T execute(BreezeHttpRequest request) {
         long start = System.currentTimeMillis();
         BreezeHttpRawResponse raw = null;
+        BreezeHttpResponse<T> response = null;
         try {
-            requestLogger.requestStart(request);
-
-            prepareRequest(request);
+            requestLogger.start(request);
+            prepare(request);
             raw = invoke(request);
-            BreezeHttpResponse<T> response = processResponse(request, raw);
-            if (!(response.body() instanceof Closeable)) {
-                raw.close();
-            }
-            BreezeHttpFilter.invoke(filters, request, filter -> filter.complete(request, response));
-
-            request.duration(System.currentTimeMillis() - start);
-            requestLogger.requestEnd(request, response);
+            response = process(request, raw);
+            requestLogger.end(request, response);
 
             return isSubclass(BreezeHttpResponse.class, request.returnType()) ? cast(response) : response.body();
         } catch (Throwable t) {
-            try {
-                request.duration(System.currentTimeMillis() - start);
-                requestLogger.requestError(request, t);
-                BreezeHttpFilter.invoke(filters, request, filter -> filter.exception(request, t));
-
-                if (t instanceof BreezeHttpException) {
-                    throw (BreezeHttpException) t;
-                } else {
-                    // FIXME: Use BreezeHttpResponseException.create?
-                    IOException io = BreezeHttpIOException.findIOExceptionCause(t);
-                    throw io == null ? new BreezeHttpException(t) : new BreezeHttpIOException(t);
-                }
-            } finally {
-                if (raw != null) {
-                    raw.close();
-                }
-            }
+            throw handleException(request, raw, response, t);
+        } finally {
+            request.duration(System.currentTimeMillis() - start);
         }
     }
 
-    protected void prepareRequest(BreezeHttpRequest request) {
+    protected void prepare(BreezeHttpRequest request) {
         Object body = request.body();
         if (request.contentType() == null) {
             if (body instanceof BreezeHttpForm) {
@@ -135,22 +114,43 @@ public abstract class AbstractInvokingBreezeHttpClient extends AbstractBreezeHtt
             }
         }
 
-        BreezeHttpBodyConverter.convertRequest(converters, converter -> converter.convert(request));
-        BreezeHttpFilter.invoke(filters, request, filter -> filter.prepare(request));
+        request.convertBody();
+        BreezeHttpFilter.filter(request, filter -> filter.setup(request));
     }
 
-    protected <T> BreezeHttpResponse<T> processResponse(BreezeHttpRequest request, BreezeHttpRawResponse raw) {
-        BreezeHttpFilter.invoke(filters, request, filter -> filter.executed(request, raw));
+    protected <T> BreezeHttpResponse<T> process(BreezeHttpRequest request, BreezeHttpRawResponse raw) {
+        BreezeHttpFilter.filter(request, filter -> filter.executed(request, raw));
         if (request.returnType() == BreezeHttpRawResponse.class) {
             return cast(raw);
         }
 
         if (errorHandler.isError(request, raw)) {
-            BreezeHttpFilter.invoke(filters, request, filter -> filter.error(request, raw));
+            BreezeHttpFilter.filter(request, filter -> filter.error(request, raw));
             errorHandler.handleError(request, raw);
         }
 
-        return BreezeHttpBodyConverter.convertResponse(request, raw, request.conversionType());
+        BreezeHttpResponse<T> response = raw.convertResponse(request.conversionType());
+        if (!(response.body() instanceof Closeable)) {
+            raw.close();
+        }
+        BreezeHttpFilter.filter(request, filter -> filter.complete(request, response));
+
+        return response;
+    }
+
+    protected BreezeHttpExecutionException handleException(
+            BreezeHttpRequest request,
+            BreezeHttpRawResponse raw,
+            BreezeHttpResponse<?> response,
+            Throwable t
+    ) {
+        requestLogger.exception(request, t);
+        BreezeHttpFilter.filter(request, filter -> filter.exception(request, response, t));
+        if (raw != null) {
+            raw.close();
+        }
+
+        return BreezeHttpResponseException.create(request, raw, response, t);
     }
 
     /** Splunk-friendly toString: more intuitive to search for BreezeHttp than implementation names. */

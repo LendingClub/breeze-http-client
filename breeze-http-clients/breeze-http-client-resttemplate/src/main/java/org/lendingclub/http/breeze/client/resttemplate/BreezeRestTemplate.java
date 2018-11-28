@@ -1,17 +1,16 @@
 package org.lendingclub.http.breeze.client.resttemplate;
 
 import org.lendingclub.http.breeze.client.resttemplate.response.BreezeHttpRestTemplateRawResponse;
-import org.lendingclub.http.breeze.exception.BreezeHttpIOException;
+import org.lendingclub.http.breeze.exception.BreezeHttpException;
+import org.lendingclub.http.breeze.request.BreezeHttpRequest;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.net.URI;
 
 public class BreezeRestTemplate extends RestTemplate implements BreezeHttpRestTemplate {
@@ -44,22 +43,25 @@ public class BreezeRestTemplate extends RestTemplate implements BreezeHttpRestTe
             URI url,
             HttpMethod method,
             HttpEntity<?> requestEntity,
-            Type conversionType,
-            boolean bufferResponse
+            BreezeHttpRequest request
     ) {
         try {
-            ClientHttpRequest request;
-            if (bufferResponse) {
+            ClientHttpRequest httpRequest;
+            if (request.bufferResponse()) {
                 // Doesn't work if requestFactory has bufferRequestBody=false
-                request = bufferingRequestFactory.createRequest(url, method);
+                httpRequest = bufferingRequestFactory.createRequest(url, method);
             } else {
-                request = createRequest(url, method);
+                httpRequest = createRequest(url, method);
             }
 
-            httpEntityCallback(requestEntity, conversionType).doWithRequest(request);
-            return new BreezeHttpRestTemplateRawResponse(conversionType, request.execute(), getMessageConverters());
-        } catch (IOException | ResourceAccessException e) {
-            throw new BreezeHttpIOException(e);
+            httpEntityCallback(requestEntity, request.conversionType()).doWithRequest(httpRequest);
+            return new BreezeHttpRestTemplateRawResponse(
+                    request.breeze().converters(),
+                    httpRequest.execute(),
+                    getMessageConverters()
+            );
+        } catch (IOException e) {
+            throw new BreezeHttpException(e);
         }
     }
 }

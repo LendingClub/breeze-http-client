@@ -1,12 +1,13 @@
 package org.lendingclub.http.breeze.filter;
 
 import org.lendingclub.http.breeze.client.json.BreezeHttpJsonMapper;
-import org.lendingclub.http.breeze.exception.BreezeHttpIOException;
+import org.lendingclub.http.breeze.exception.BreezeHttpException;
 import org.lendingclub.http.breeze.exception.BreezeHttpResponseException;
 import org.lendingclub.http.breeze.request.BreezeHttpRequest;
 import org.lendingclub.http.breeze.request.body.BreezeHttpForm;
 import org.lendingclub.http.breeze.request.body.BreezeHttpMultipart;
 import org.lendingclub.http.breeze.response.BreezeHttpRawResponse;
+import org.lendingclub.http.breeze.response.BreezeHttpResponse;
 
 import java.io.IOException;
 import java.util.function.Predicate;
@@ -47,13 +48,13 @@ public class BreezeHttpDetailLoggingFilter implements BreezeHttpFilter {
     }
 
     @Override
-    public boolean init(BreezeHttpRequest request) {
+    public boolean created(BreezeHttpRequest request) {
         request.bufferResponse(true);
         return true;
     }
 
     @Override
-    public boolean prepare(BreezeHttpRequest request) {
+    public boolean setup(BreezeHttpRequest request) {
         try {
             if (!logger.isLoggable(level)) {
                 return true;
@@ -195,7 +196,7 @@ public class BreezeHttpDetailLoggingFilter implements BreezeHttpFilter {
     }
 
     @Override
-    public boolean exception(BreezeHttpRequest request, Throwable t) {
+    public boolean exception(BreezeHttpRequest request, BreezeHttpResponse<?> response, Throwable t) {
         try {
             if (!logger.isLoggable(level)) {
                 return true;
@@ -207,7 +208,7 @@ public class BreezeHttpDetailLoggingFilter implements BreezeHttpFilter {
                     .append(" ====================")
                     .append(nl).append("error    : ").append(t)
                     .append(nl).append("cause    : ").append(t.getCause());
-            IOException io = BreezeHttpIOException.findIOExceptionCause(t);
+            IOException io = BreezeHttpException.findIOException(t);
             if (t.getCause() != io) {
                 b.append(nl).append("i/o cause: ").append(io);
             }

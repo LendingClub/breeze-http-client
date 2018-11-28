@@ -1,7 +1,7 @@
 package org.lendingclub.http.breeze.client.resttemplate;
 
 import org.lendingclub.http.breeze.client.AbstractInvokingBreezeHttpClient;
-import org.lendingclub.http.breeze.converter.BreezeHttpBodyConverter;
+import org.lendingclub.http.breeze.converter.BreezeHttpConverter;
 import org.lendingclub.http.breeze.error.BreezeHttpErrorHandler;
 import org.lendingclub.http.breeze.filter.BreezeHttpFilter;
 import org.lendingclub.http.breeze.logging.BreezeHttpRequestLogger;
@@ -42,7 +42,7 @@ public class BreezeHttpRestTemplateClient extends AbstractInvokingBreezeHttpClie
     public BreezeHttpRestTemplateClient(
             BreezeHttpRestTemplate breezeTemplate,
             BreezeHttpRequestLogger requestLogger,
-            Collection<BreezeHttpBodyConverter> converters,
+            Collection<BreezeHttpConverter> converters,
             Collection<BreezeHttpFilter> filters,
             BreezeHttpErrorHandler errorHandler
     ) {
@@ -60,8 +60,7 @@ public class BreezeHttpRestTemplateClient extends AbstractInvokingBreezeHttpClie
                 buildURI(request),
                 HttpMethod.valueOf(request.method().toString()),
                 createRequestEntity(request),
-                request.conversionType(),
-                request.bufferResponse()
+                request
         );
     }
 

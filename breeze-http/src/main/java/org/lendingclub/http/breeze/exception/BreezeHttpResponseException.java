@@ -13,19 +13,10 @@ import static org.lendingclub.http.breeze.response.BreezeHttpResponse.HttpStatus
 import static org.lendingclub.http.breeze.response.BreezeHttpResponse.HttpStatusClass.SERVER_ERROR;
 import static org.lendingclub.http.breeze.util.BreezeHttpUtil.cast;
 
-public class BreezeHttpResponseException extends BreezeHttpException {
+public class BreezeHttpResponseException extends BreezeHttpExecutionException {
     public static final long serialVersionUID = -1;
 
-    private final BreezeHttpRequest request;
     private final BreezeHttpResponse<?> response;
-
-    public BreezeHttpResponseException(BreezeHttpRequest request, BreezeHttpResponse<?> response) {
-        this("HTTP error response executing request", request, response, null);
-    }
-
-    public BreezeHttpResponseException(String message, BreezeHttpRequest request, BreezeHttpResponse<?> response) {
-        this(message, request, response, null);
-    }
 
     public BreezeHttpResponseException(BreezeHttpRequest request, BreezeHttpResponse<?> response, Throwable t) {
         this("HTTP error response executing request", request, response, t);
@@ -37,13 +28,8 @@ public class BreezeHttpResponseException extends BreezeHttpException {
             BreezeHttpResponse<?> response,
             Throwable t
     ) {
-        super(message, t);
-        this.request = request;
+        super(message, request, t);
         this.response = response;
-    }
-
-    public BreezeHttpRequest request() {
-        return request;
     }
 
     public <T> BreezeHttpResponse<T> response() {
@@ -80,31 +66,5 @@ public class BreezeHttpResponseException extends BreezeHttpException {
 
     public String header(String name) {
         return response == null ? null : response.header(name);
-    }
-
-    public static BreezeHttpResponseException create(BreezeHttpRequest request, BreezeHttpResponse<?> response) {
-        if (response != null) {
-            if (response.httpStatusClass() == CLIENT_ERROR) {
-                return new BreezeHttpClientErrorException(request, response);
-            } else if (response.httpStatusClass() == SERVER_ERROR) {
-                return new BreezeHttpServerErrorException(request, response);
-            }
-        }
-        return new BreezeHttpResponseException(request, response);
-    }
-
-    public static BreezeHttpResponseException create(
-            BreezeHttpRequest request,
-            BreezeHttpResponse<?> response,
-            Throwable t
-    ) {
-        if (response != null) {
-            if (response.httpStatusClass() == CLIENT_ERROR) {
-                return new BreezeHttpClientErrorException(request, response, t);
-            } else if (response.httpStatusClass() == SERVER_ERROR) {
-                return new BreezeHttpServerErrorException(request, response, t);
-            }
-        }
-        return new BreezeHttpResponseException(request, response, t);
     }
 }

@@ -1,6 +1,6 @@
 package org.lendingclub.http.breeze.util;
 
-import org.lendingclub.http.breeze.exception.BreezeHttpIOException;
+import org.lendingclub.http.breeze.exception.BreezeHttpException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -43,7 +43,7 @@ public class BreezeHttpUtil {
             output.flush();
             return output.toByteArray();
         } catch (IOException e) {
-            throw new BreezeHttpIOException(e);
+            throw new BreezeHttpException(e);
         }
     }
 

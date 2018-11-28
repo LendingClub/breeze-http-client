@@ -1,6 +1,6 @@
 package org.lendingclub.http.breeze.logging;
 
-import org.lendingclub.http.breeze.exception.BreezeHttpIOException;
+import org.lendingclub.http.breeze.exception.BreezeHttpException;
 import org.lendingclub.http.breeze.exception.BreezeHttpResponseException;
 import org.lendingclub.http.breeze.request.BreezeHttpRequest;
 import org.lendingclub.http.breeze.response.BreezeHttpResponse;
@@ -33,14 +33,14 @@ public class DefaultBreezeHttpRequestLogger implements BreezeHttpRequestLogger {
     }
 
     @Override
-    public void requestStart(BreezeHttpRequest request) {
+    public void start(BreezeHttpRequest request) {
         if (logger != null && logger.isLoggable(level)) {
             logger.log(level, "executing " + request);
         }
     }
 
     @Override
-    public void requestEnd(BreezeHttpRequest request, BreezeHttpResponse<?> response) {
+    public void end(BreezeHttpRequest request, BreezeHttpResponse<?> response) {
         if (logger != null && logger.isLoggable(level)) {
             logger.log(level,
                     "executed " + request
@@ -52,7 +52,7 @@ public class DefaultBreezeHttpRequestLogger implements BreezeHttpRequestLogger {
     }
 
     @Override
-    public void requestError(BreezeHttpRequest request, Throwable t) {
+    public void exception(BreezeHttpRequest request, Throwable t) {
         boolean isClientError = (t instanceof BreezeHttpResponseException)
                 && ((BreezeHttpResponseException) t).isClientError();
         if (logger == null
@@ -65,9 +65,7 @@ public class DefaultBreezeHttpRequestLogger implements BreezeHttpRequestLogger {
                 + " success=false"
                 + " error=" + quote(t.getClass().getSimpleName()));
 
-        if (BreezeHttpIOException.findIOExceptionCause(t) != null) {
-            msg.append(", isNetworkError=").append(BreezeHttpIOException.findIOExceptionCause(t) != null);
-        }
+        msg.append(", isNetworkError=").append(BreezeHttpException.findIOException(t) != null);
 
         if (t instanceof BreezeHttpResponseException) {
             msg.append(" httpStatus=").append(((BreezeHttpResponseException) t).httpStatus());
