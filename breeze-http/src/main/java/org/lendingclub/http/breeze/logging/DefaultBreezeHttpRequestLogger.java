@@ -66,7 +66,7 @@ public class DefaultBreezeHttpRequestLogger implements BreezeHttpRequestLogger {
                 + " success=false"
                 + " error=" + simpleName(e)
                 + " cause=" + simpleName(cause)
-                + " networkError=").append(simpleName(BreezeHttpException.findIOException(cause)));
+                + " networkError=" + simpleName(BreezeHttpException.findIOException(cause)));
 
         BreezeHttpRawResponse raw = e.raw();
         if (raw != null) {

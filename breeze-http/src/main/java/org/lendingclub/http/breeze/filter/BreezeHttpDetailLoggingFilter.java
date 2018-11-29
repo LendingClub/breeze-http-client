@@ -152,7 +152,7 @@ public class BreezeHttpDetailLoggingFilter implements BreezeHttpFilter {
             }
 
             StringBuilder b = new StringBuilder()
-                    .append(nl).append(nl).append("==================== Completed ")
+                    .append(nl).append(nl).append("==================== Executed ")
                     .append(request.toStringShort())
                     .append(" ====================")
                     .append(nl).append("httpStatus   : ").append(raw.httpStatus());
@@ -197,7 +197,7 @@ public class BreezeHttpDetailLoggingFilter implements BreezeHttpFilter {
 
     @Override
     public boolean exception(BreezeHttpExecutionException e) {
-        Throwable t = e.getCause();
+        Throwable cause = e.getCause();
         BreezeHttpRequest request = e.request();
 
         try {
@@ -209,10 +209,10 @@ public class BreezeHttpDetailLoggingFilter implements BreezeHttpFilter {
                     .append(nl).append(nl).append("==================== Exception processing ")
                     .append(request.toStringShort())
                     .append(" ====================")
-                    .append(nl).append("error    : ").append(t)
-                    .append(nl).append("cause    : ").append(t.getCause());
-            IOException io = BreezeHttpException.findIOException(t);
-            if (t.getCause() != io) {
+                    .append(nl).append("error    : ").append(e)
+                    .append(nl).append("cause    : ").append(cause);
+            IOException io = BreezeHttpException.findIOException(cause);
+            if (io != null) {
                 b.append(nl).append("i/o cause: ").append(io);
             }
 

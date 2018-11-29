@@ -85,7 +85,7 @@ public abstract class AbstractDecoratedBreezeHttpClient extends AbstractBreezeHt
 
     @Override
     public <T> T execute(BreezeHttpRequest request) throws BreezeHttpException {
-        return execute(request, (commandRequest) -> breeze.execute(request));
+        return execute(request, command -> breeze.execute(request));
     }
 
     /** Decorate the command if the request matches, otherwise execute it normally. */
