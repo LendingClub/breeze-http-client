@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 import static org.lendingclub.http.breeze.util.BreezeHttpUtil.quote;
+import static org.lendingclub.http.breeze.util.BreezeHttpUtil.simpleName;
 
 public abstract class AbstractDecoratedBreezeHttpClient extends AbstractBreezeHttpClient implements DecoratedBreezeHttp {
     protected final BreezeHttp breeze;
@@ -119,8 +120,6 @@ public abstract class AbstractDecoratedBreezeHttpClient extends AbstractBreezeHt
     /** Splunk-friendly toString: more intuitive to search for BreezeHttp than implementation names. */
     @Override
     public String toString() {
-        return "BreezeHttp{client=" + client.getClass().getSimpleName()
-                + ", decorators=" + quote(decorators)
-                + "}";
+        return "BreezeHttp{client=" + simpleName(client) + ", decorators=" + quote(decorators) + "}";
     }
 }

@@ -4,9 +4,6 @@ import org.lendingclub.http.breeze.request.BreezeHttpRequest;
 import org.lendingclub.http.breeze.response.BreezeHttpRawResponse;
 import org.lendingclub.http.breeze.response.BreezeHttpResponse;
 
-import static org.lendingclub.http.breeze.response.BreezeHttpResponse.HttpStatusClass.CLIENT_ERROR;
-import static org.lendingclub.http.breeze.response.BreezeHttpResponse.HttpStatusClass.SERVER_ERROR;
-
 public class BreezeHttpExecutionException extends BreezeHttpException {
     public static final long serialVersionUID = -1;
 
@@ -49,9 +46,9 @@ public class BreezeHttpExecutionException extends BreezeHttpException {
 
         if (raw == null) {
             return new BreezeHttpExecutionException(request, null, null, t);
-        } else if (raw.httpStatusClass() == CLIENT_ERROR) {
+        } else if (raw.isClientError()) {
             return new BreezeHttpClientErrorException(request, raw, response, t);
-        } else if (raw.httpStatusClass() == SERVER_ERROR) {
+        } else if (raw.isServerError()) {
             return new BreezeHttpServerErrorException(request, raw, response, t);
         } else {
             return new BreezeHttpResponseException(request, raw, response, t);

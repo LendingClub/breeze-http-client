@@ -1,8 +1,8 @@
 package org.lendingclub.http.breeze.logging;
 
+import org.lendingclub.http.breeze.exception.BreezeHttpClientErrorException;
 import org.lendingclub.http.breeze.exception.BreezeHttpException;
 import org.lendingclub.http.breeze.exception.BreezeHttpExecutionException;
-import org.lendingclub.http.breeze.exception.BreezeHttpResponseException;
 import org.lendingclub.http.breeze.request.BreezeHttpRequest;
 import org.lendingclub.http.breeze.response.BreezeHttpRawResponse;
 import org.lendingclub.http.breeze.response.BreezeHttpResponse;
@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 import static java.util.logging.Level.INFO;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Level.WARNING;
-import static org.lendingclub.http.breeze.util.BreezeHttpUtil.quote;
+import static org.lendingclub.http.breeze.util.BreezeHttpUtil.simpleName;
 
 public class DefaultBreezeHttpRequestLogger implements BreezeHttpRequestLogger {
     private final Logger logger;
@@ -55,22 +55,18 @@ public class DefaultBreezeHttpRequestLogger implements BreezeHttpRequestLogger {
 
     @Override
     public void exception(BreezeHttpExecutionException e) {
-        Throwable t = e.getCause();
-        BreezeHttpRequest request = e.request();
-
-        boolean isClientError = (t instanceof BreezeHttpResponseException)
-                && ((BreezeHttpResponseException) t).isClientError();
-        if (logger == null
-                || !logger.isLoggable(SEVERE)
-                || (isClientError && warnClientErrors && !logger.isLoggable(WARNING))) {
+        Throwable cause = e.getCause();
+        Level logLevel = cause instanceof BreezeHttpClientErrorException && warnClientErrors ? WARNING : SEVERE;
+        if (logger == null || !logger.isLoggable(logLevel)) {
             return;
         }
 
+        BreezeHttpRequest request = e.request();
         StringBuilder msg = new StringBuilder("executed " + request
                 + " success=false"
-                + " error=" + quote(e.getClass().getSimpleName()));
-
-        msg.append(", isNetworkError=").append(BreezeHttpException.findIOException(t) != null);
+                + " error=" + simpleName(e)
+                + " cause=" + simpleName(cause)
+                + " networkError=").append(simpleName(BreezeHttpException.findIOException(cause)));
 
         BreezeHttpRawResponse raw = e.raw();
         if (raw != null) {
@@ -80,6 +76,6 @@ public class DefaultBreezeHttpRequestLogger implements BreezeHttpRequestLogger {
 
         msg.append(" duration=").append(request.duration());
 
-        logger.log(isClientError && warnClientErrors ? WARNING : SEVERE, msg.toString());
+        logger.log(logLevel, msg.toString());
     }
 }

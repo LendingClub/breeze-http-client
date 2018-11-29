@@ -80,4 +80,8 @@ public class BreezeHttpUtil {
             throw new IllegalStateException(e);
         }
     }
+
+    public static String simpleName(Object o) {
+        return o == null ? "null" : quote(o.getClass().getSimpleName());
+    }
 }

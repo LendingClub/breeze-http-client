@@ -11,6 +11,7 @@ import static org.lendingclub.http.breeze.response.BreezeHttpResponse.HttpStatus
 import static org.lendingclub.http.breeze.response.BreezeHttpResponse.HttpStatusClass.SERVER_ERROR;
 import static org.lendingclub.http.breeze.response.BreezeHttpResponse.HttpStatusClass.SUCCESS;
 import static org.lendingclub.http.breeze.util.BreezeHttpUtil.quote;
+import static org.lendingclub.http.breeze.util.BreezeHttpUtil.simpleName;
 
 /**
  * HTTP response class with status code, headers, and body.
@@ -133,7 +134,7 @@ public class BreezeHttpResponse<T> {
     @Override
     public String toString() {
         return "BreezeHttpResponse@" + Integer.toHexString(hashCode()) + "{"
-                + "body=" + (body == null ? "null" : quote(body.getClass().getSimpleName()))
+                + "body=" + simpleName(body)
                 + " httpStatus=" + httpStatus
                 + " headers=" + quote(headers.keySet())
                 + "}";

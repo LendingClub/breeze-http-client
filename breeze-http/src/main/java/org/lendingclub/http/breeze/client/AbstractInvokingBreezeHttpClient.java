@@ -26,6 +26,7 @@ import static org.lendingclub.http.breeze.util.BreezeHttpUtil.IS_GSON_PRESENT;
 import static org.lendingclub.http.breeze.util.BreezeHttpUtil.IS_JACKSON_PRESENT;
 import static org.lendingclub.http.breeze.util.BreezeHttpUtil.IS_JSON_PATH_PRESENT;
 import static org.lendingclub.http.breeze.util.BreezeHttpUtil.cast;
+import static org.lendingclub.http.breeze.util.BreezeHttpUtil.simpleName;
 
 public abstract class AbstractInvokingBreezeHttpClient extends AbstractBreezeHttpClient {
     protected final BreezeHttpRequestLogger requestLogger;
@@ -156,7 +157,7 @@ public abstract class AbstractInvokingBreezeHttpClient extends AbstractBreezeHtt
     /** Splunk-friendly toString: more intuitive to search for BreezeHttp than implementation names. */
     @Override
     public String toString() {
-        return "BreezeHttp{client=" + getClass().getSimpleName() + "}";
+        return "BreezeHttp{client=" + simpleName(this) + "}";
     }
 
     protected abstract BreezeHttpRawResponse invoke(BreezeHttpRequest request);
