@@ -1,6 +1,7 @@
 package org.lendingclub.http.breeze.exception;
 
 import org.lendingclub.http.breeze.request.BreezeHttpRequest;
+import org.lendingclub.http.breeze.response.BreezeHttpRawResponse;
 import org.lendingclub.http.breeze.response.BreezeHttpResponse;
 import org.lendingclub.http.breeze.response.BreezeHttpResponse.HttpStatusClass;
 
@@ -16,24 +17,13 @@ import static org.lendingclub.http.breeze.util.BreezeHttpUtil.cast;
 public class BreezeHttpResponseException extends BreezeHttpExecutionException {
     public static final long serialVersionUID = -1;
 
-    private final BreezeHttpResponse<?> response;
-
-    public BreezeHttpResponseException(BreezeHttpRequest request, BreezeHttpResponse<?> response, Throwable t) {
-        this("HTTP error response executing request", request, response, t);
-    }
-
     public BreezeHttpResponseException(
-            String message,
             BreezeHttpRequest request,
+            BreezeHttpRawResponse raw,
             BreezeHttpResponse<?> response,
             Throwable t
     ) {
-        super(message, request, t);
-        this.response = response;
-    }
-
-    public <T> BreezeHttpResponse<T> response() {
-        return cast(response);
+        super(request, raw, response, t);
     }
 
     public <T> T body() {
@@ -41,11 +31,11 @@ public class BreezeHttpResponseException extends BreezeHttpExecutionException {
     }
 
     public int httpStatus() {
-        return response == null ? 0 : response.httpStatus();
+        return raw == null ? 0 : raw.httpStatus();
     }
 
     public HttpStatusClass httpStatusClass() {
-        return response == null ? null : response.httpStatusClass();
+        return raw == null ? null : raw.httpStatusClass();
     }
 
     public boolean isClientError() {
@@ -57,14 +47,14 @@ public class BreezeHttpResponseException extends BreezeHttpExecutionException {
     }
 
     public Map<String, List<String>> headers() {
-        return response == null ? emptyMap() : response.headers();
+        return raw == null ? emptyMap() : raw.headers();
     }
 
     public List<String> headers(String name) {
-        return response == null ? emptyList() : response.headers(name);
+        return raw == null ? emptyList() : raw.headers(name);
     }
 
     public String header(String name) {
-        return response == null ? null : response.header(name);
+        return raw == null ? null : raw.header(name);
     }
 }

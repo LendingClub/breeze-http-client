@@ -69,7 +69,7 @@ public class BreezeHttpOk3Client extends AbstractInvokingBreezeHttpClient {
             Response okResponse = okClient.newCall(createOkRequest(request)).execute();
             return new BreezeHttpOk3RawResponse(request, okResponse, this);
         } catch (IOException t) {
-            throw new BreezeHttpExecutionException(request, t);
+            throw new BreezeHttpExecutionException(request, null, null, t);
         }
     }
 

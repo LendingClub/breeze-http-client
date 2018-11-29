@@ -7,7 +7,6 @@ import org.lendingclub.http.breeze.converter.BreezeHttpJsonPathTypesConverter;
 import org.lendingclub.http.breeze.error.BreezeHttpErrorHandler;
 import org.lendingclub.http.breeze.error.DefaultBreezeHttpErrorHandler;
 import org.lendingclub.http.breeze.exception.BreezeHttpExecutionException;
-import org.lendingclub.http.breeze.exception.BreezeHttpResponseException;
 import org.lendingclub.http.breeze.filter.BreezeHttpFilter;
 import org.lendingclub.http.breeze.logging.BreezeHttpRequestLogger;
 import org.lendingclub.http.breeze.logging.DefaultBreezeHttpRequestLogger;
@@ -87,22 +86,29 @@ public abstract class AbstractInvokingBreezeHttpClient extends AbstractBreezeHtt
         long start = System.currentTimeMillis();
         BreezeHttpRawResponse raw = null;
         BreezeHttpResponse<T> response = null;
-        try {
-            requestLogger.start(request);
-            prepare(request);
-            raw = invoke(request);
-            response = process(request, raw);
-            requestLogger.end(request, response);
 
-            return isSubclass(BreezeHttpResponse.class, request.returnType()) ? cast(response) : response.body();
+        try {
+            try {
+                requestLogger.start(request);
+                setup(request);
+                raw = invoke(request);
+                response = process(request, raw);
+                complete(request, raw, response);
+            } finally {
+                request.duration(System.currentTimeMillis() - start);
+            }
+            requestLogger.end(request, response);
         } catch (Throwable t) {
-            throw handleException(request, raw, response, t);
-        } finally {
-            request.duration(System.currentTimeMillis() - start);
+            BreezeHttpExecutionException e = BreezeHttpExecutionException.create(request, raw, response, t);
+            requestLogger.exception(e);
+            BreezeHttpFilter.filter(e.request(), filter -> filter.exception(e));
+            response = errorHandler.handleException(e);
         }
+
+        return isSubclass(BreezeHttpResponse.class, request.returnType()) ? cast(response) : response.body();
     }
 
-    protected void prepare(BreezeHttpRequest request) {
+    protected void setup(BreezeHttpRequest request) {
         Object body = request.body();
         if (request.contentType() == null) {
             if (body instanceof BreezeHttpForm) {
@@ -114,7 +120,12 @@ public abstract class AbstractInvokingBreezeHttpClient extends AbstractBreezeHtt
             }
         }
 
-        request.convertBody();
+        for (BreezeHttpConverter converter : converters) {
+            if (!converter.convertRequestBody(request)) {
+                break;
+            }
+        }
+
         BreezeHttpFilter.filter(request, filter -> filter.setup(request));
     }
 
@@ -126,31 +137,20 @@ public abstract class AbstractInvokingBreezeHttpClient extends AbstractBreezeHtt
 
         if (errorHandler.isError(request, raw)) {
             BreezeHttpFilter.filter(request, filter -> filter.error(request, raw));
-            errorHandler.handleError(request, raw);
+            BreezeHttpResponse<T> response = errorHandler.handleError(request, raw);
+            if (response != null) {
+                return response;
+            }
         }
 
-        BreezeHttpResponse<T> response = raw.convertResponse(request.conversionType());
+        return raw.convertResponse(request.conversionType());
+    }
+
+    protected void complete(BreezeHttpRequest request, BreezeHttpRawResponse raw, BreezeHttpResponse<?> response) {
         if (!(response.body() instanceof Closeable)) {
             raw.close();
         }
         BreezeHttpFilter.filter(request, filter -> filter.complete(request, response));
-
-        return response;
-    }
-
-    protected BreezeHttpExecutionException handleException(
-            BreezeHttpRequest request,
-            BreezeHttpRawResponse raw,
-            BreezeHttpResponse<?> response,
-            Throwable t
-    ) {
-        requestLogger.exception(request, t);
-        BreezeHttpFilter.filter(request, filter -> filter.exception(request, response, t));
-        if (raw != null) {
-            raw.close();
-        }
-
-        return BreezeHttpResponseException.create(request, raw, response, t);
     }
 
     /** Splunk-friendly toString: more intuitive to search for BreezeHttp than implementation names. */

@@ -1,5 +1,6 @@
 package org.lendingclub.http.breeze.filter;
 
+import org.lendingclub.http.breeze.exception.BreezeHttpExecutionException;
 import org.lendingclub.http.breeze.request.BreezeHttpRequest;
 import org.lendingclub.http.breeze.response.BreezeHttpRawResponse;
 import org.lendingclub.http.breeze.response.BreezeHttpResponse;
@@ -7,12 +8,12 @@ import org.lendingclub.http.breeze.response.BreezeHttpResponse;
 import java.util.function.Predicate;
 
 /**
- * Filter that is executed when a request is initiated, completes
- * successfully, or receives an error. Filters return true if subsequent
- * filters should be executed; false means don't process any more filters.
+ * Filter executed at various stages of the request lifecycle. Filters return
+ * true if subsequent filters should be executed; false means don't process
+ * any more filters.
  */
 public interface BreezeHttpFilter {
-    /** Whether any filters methods should be invoked for this request. */
+    /** Whether this filter should be invoked for this request. */
     default boolean shouldFilter(BreezeHttpRequest request) {
         return true;
     }
@@ -43,7 +44,7 @@ public interface BreezeHttpFilter {
     }
 
     /** Called when a request throws an exception. */
-    default boolean exception(BreezeHttpRequest request, BreezeHttpResponse<?> response, Throwable t) {
+    default boolean exception(BreezeHttpExecutionException e) {
         return true;
     }
 

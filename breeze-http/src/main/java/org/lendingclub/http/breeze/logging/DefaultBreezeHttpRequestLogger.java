@@ -1,8 +1,10 @@
 package org.lendingclub.http.breeze.logging;
 
 import org.lendingclub.http.breeze.exception.BreezeHttpException;
+import org.lendingclub.http.breeze.exception.BreezeHttpExecutionException;
 import org.lendingclub.http.breeze.exception.BreezeHttpResponseException;
 import org.lendingclub.http.breeze.request.BreezeHttpRequest;
+import org.lendingclub.http.breeze.response.BreezeHttpRawResponse;
 import org.lendingclub.http.breeze.response.BreezeHttpResponse;
 
 import java.util.logging.Level;
@@ -52,7 +54,10 @@ public class DefaultBreezeHttpRequestLogger implements BreezeHttpRequestLogger {
     }
 
     @Override
-    public void exception(BreezeHttpRequest request, Throwable t) {
+    public void exception(BreezeHttpExecutionException e) {
+        Throwable t = e.getCause();
+        BreezeHttpRequest request = e.request();
+
         boolean isClientError = (t instanceof BreezeHttpResponseException)
                 && ((BreezeHttpResponseException) t).isClientError();
         if (logger == null
@@ -63,13 +68,14 @@ public class DefaultBreezeHttpRequestLogger implements BreezeHttpRequestLogger {
 
         StringBuilder msg = new StringBuilder("executed " + request
                 + " success=false"
-                + " error=" + quote(t.getClass().getSimpleName()));
+                + " error=" + quote(e.getClass().getSimpleName()));
 
         msg.append(", isNetworkError=").append(BreezeHttpException.findIOException(t) != null);
 
-        if (t instanceof BreezeHttpResponseException) {
-            msg.append(" httpStatus=").append(((BreezeHttpResponseException) t).httpStatus());
-            msg.append(" httpStatusClass=").append(((BreezeHttpResponseException) t).httpStatusClass());
+        BreezeHttpRawResponse raw = e.raw();
+        if (raw != null) {
+            msg.append(" httpStatus=").append(raw.httpStatus());
+            msg.append(" httpStatusClass=").append(raw.httpStatusClass());
         }
 
         msg.append(" duration=").append(request.duration());

@@ -2,7 +2,6 @@ package org.lendingclub.http.breeze.request;
 
 import org.lendingclub.http.breeze.BreezeHttp;
 import org.lendingclub.http.breeze.BreezeHttpType;
-import org.lendingclub.http.breeze.converter.BreezeHttpConverter;
 import org.lendingclub.http.breeze.decorator.DecoratedBreezeHttp;
 import org.lendingclub.http.breeze.exception.BreezeHttpException;
 import org.lendingclub.http.breeze.filter.BreezeHttpFilter;
@@ -380,14 +379,6 @@ public class BreezeHttpRequest {
             return conversionType == Void.class ? null : conversionType;
         } else {
             return returnType;
-        }
-    }
-
-    public void convertBody() {
-        for (BreezeHttpConverter converter : breeze.converters()) {
-            if (!converter.convertRequestBody(this)) {
-                break;
-            }
         }
     }
 

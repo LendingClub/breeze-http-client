@@ -2,12 +2,12 @@ package org.lendingclub.http.breeze.filter;
 
 import org.lendingclub.http.breeze.client.json.BreezeHttpJsonMapper;
 import org.lendingclub.http.breeze.exception.BreezeHttpException;
+import org.lendingclub.http.breeze.exception.BreezeHttpExecutionException;
 import org.lendingclub.http.breeze.exception.BreezeHttpResponseException;
 import org.lendingclub.http.breeze.request.BreezeHttpRequest;
 import org.lendingclub.http.breeze.request.body.BreezeHttpForm;
 import org.lendingclub.http.breeze.request.body.BreezeHttpMultipart;
 import org.lendingclub.http.breeze.response.BreezeHttpRawResponse;
-import org.lendingclub.http.breeze.response.BreezeHttpResponse;
 
 import java.io.IOException;
 import java.util.function.Predicate;
@@ -196,7 +196,10 @@ public class BreezeHttpDetailLoggingFilter implements BreezeHttpFilter {
     }
 
     @Override
-    public boolean exception(BreezeHttpRequest request, BreezeHttpResponse<?> response, Throwable t) {
+    public boolean exception(BreezeHttpExecutionException e) {
+        Throwable t = e.getCause();
+        BreezeHttpRequest request = e.request();
+
         try {
             if (!logger.isLoggable(level)) {
                 return true;
@@ -213,12 +216,12 @@ public class BreezeHttpDetailLoggingFilter implements BreezeHttpFilter {
                 b.append(nl).append("i/o cause: ").append(io);
             }
 
-            if (t instanceof BreezeHttpResponseException) {
-                BreezeHttpResponseException e = (BreezeHttpResponseException) t;
-                b.append(nl).append("response : ").append(e.body() == null ? "null" : e.body().getClass().getName());
-                if (e.body() != null) {
+            if (e instanceof BreezeHttpResponseException) {
+                Object body = ((BreezeHttpResponseException) e).body();
+                b.append(nl).append("response : ").append(body == null ? "null" : body.getClass().getName());
+                if (body != null) {
                     b.append(nl).append("-------------------- response class --------------------").append(nl);
-                    b.append(e.body().toString());
+                    b.append(body.toString());
                     b.append(nl).append("-------------------- response class --------------------");
                 }
             }

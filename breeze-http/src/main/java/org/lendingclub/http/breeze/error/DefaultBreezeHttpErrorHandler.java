@@ -1,6 +1,6 @@
 package org.lendingclub.http.breeze.error;
 
-import org.lendingclub.http.breeze.exception.BreezeHttpException;
+import org.lendingclub.http.breeze.exception.BreezeHttpExecutionException;
 import org.lendingclub.http.breeze.request.BreezeHttpRequest;
 import org.lendingclub.http.breeze.response.BreezeHttpRawResponse;
 import org.lendingclub.http.breeze.response.BreezeHttpResponse;
@@ -43,7 +43,7 @@ public class DefaultBreezeHttpErrorHandler implements BreezeHttpErrorHandler {
     }
 
     @Override
-    public void handleError(BreezeHttpRequest request, BreezeHttpRawResponse raw) {
+    public <T> BreezeHttpResponse<T> handleError(BreezeHttpRequest request, BreezeHttpRawResponse raw) {
         BreezeHttpResponse<?> response = null;
         Throwable error = null;
 
@@ -53,6 +53,15 @@ public class DefaultBreezeHttpErrorHandler implements BreezeHttpErrorHandler {
             error = t;
         }
 
-        throw BreezeHttpException.create(request, raw, response, error);
+        throw BreezeHttpExecutionException.create(request, raw, response, error);
+    }
+
+    @Override
+    public <T> BreezeHttpResponse<T> handleException(BreezeHttpExecutionException e) {
+        if (e.raw() != null) {
+            e.raw().close();
+        }
+
+        throw e;
     }
 }

@@ -1,5 +1,6 @@
 package org.lendingclub.http.breeze.logging;
 
+import org.lendingclub.http.breeze.exception.BreezeHttpExecutionException;
 import org.lendingclub.http.breeze.request.BreezeHttpRequest;
 import org.lendingclub.http.breeze.response.BreezeHttpResponse;
 
@@ -8,5 +9,5 @@ public interface BreezeHttpRequestLogger {
 
     void end(BreezeHttpRequest request, BreezeHttpResponse<?> response);
 
-    void exception(BreezeHttpRequest request, Throwable t);
+    void exception(BreezeHttpExecutionException e);
 }
