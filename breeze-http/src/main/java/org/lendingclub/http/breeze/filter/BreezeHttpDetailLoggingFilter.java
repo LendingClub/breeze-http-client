@@ -62,7 +62,7 @@ public class BreezeHttpDetailLoggingFilter implements BreezeHttpFilter {
 
             request.bufferResponse(true);
             StringBuilder b = new StringBuilder()
-                    .append(nl).append(nl).append("==================== Initiating ")
+                    .append(nl).append(nl).append("==================== Setup ")
                     .append(request.toStringShort())
                     .append(" ====================")
                     .append(nl).append("url           : ").append(request.url())

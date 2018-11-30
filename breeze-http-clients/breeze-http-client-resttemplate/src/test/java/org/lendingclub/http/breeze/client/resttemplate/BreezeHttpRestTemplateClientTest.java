@@ -38,7 +38,7 @@ public class BreezeHttpRestTemplateClientTest extends ClientIntegrationTest {
         ));
     }
 
-//    static {
-//        System.setProperty("logging.level.org.apache.http", "DEBUG");
-//    }
+    static {
+        System.setProperty("logging.level.org.apache.http", "INFO");
+    }
 }
