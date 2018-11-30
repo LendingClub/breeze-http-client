@@ -48,7 +48,7 @@ public class DefaultBreezeHttpErrorHandler implements BreezeHttpErrorHandler {
         Throwable error = null;
 
         try {
-            response = raw.convertResponse(errorResponseBodyType);
+            response = raw.toResponse(errorResponseBodyType);
         } catch (Throwable t) {
             error = t;
         }

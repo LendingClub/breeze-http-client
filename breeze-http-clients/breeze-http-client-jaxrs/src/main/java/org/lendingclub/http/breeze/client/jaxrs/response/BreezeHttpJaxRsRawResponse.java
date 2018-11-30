@@ -17,7 +17,7 @@ public class BreezeHttpJaxRsRawResponse extends BreezeHttpRawResponse {
     private final boolean hasEntity;
 
     public BreezeHttpJaxRsRawResponse(BreezeHttpRequest request, Response response) {
-        super(request.breeze().converters());
+        super(request);
         this.response = response;
         this.hasEntity = response.hasEntity();
         this.httpStatus = response.getStatus();

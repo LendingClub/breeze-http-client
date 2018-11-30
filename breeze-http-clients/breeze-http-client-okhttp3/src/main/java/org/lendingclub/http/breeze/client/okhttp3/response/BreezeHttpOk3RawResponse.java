@@ -27,7 +27,7 @@ public class BreezeHttpOk3RawResponse extends BreezeHttpRawResponse {
     protected final byte[] bufferedBody;
 
     public BreezeHttpOk3RawResponse(BreezeHttpRequest request, Response okResponse, BreezeHttpOk3Client breeze) {
-        super(breeze.converters());
+        super(request);
         this.okResponse = okResponse;
         this.okBody = okResponse.body();
         this.breeze = breeze;

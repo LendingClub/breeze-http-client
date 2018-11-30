@@ -1,7 +1,7 @@
 package org.lendingclub.http.breeze.client.resttemplate.response;
 
-import org.lendingclub.http.breeze.converter.BreezeHttpConverter;
 import org.lendingclub.http.breeze.exception.BreezeHttpException;
+import org.lendingclub.http.breeze.request.BreezeHttpRequest;
 import org.lendingclub.http.breeze.response.BreezeHttpRawResponse;
 import org.lendingclub.http.breeze.response.BreezeHttpResponseInputStream;
 import org.springframework.http.HttpHeaders;
@@ -25,11 +25,11 @@ public class BreezeHttpRestTemplateRawResponse extends BreezeHttpRawResponse {
     private final List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
 
     public BreezeHttpRestTemplateRawResponse(
-            List<BreezeHttpConverter> converters,
+            BreezeHttpRequest request,
             ClientHttpResponse clientResponse,
             List<HttpMessageConverter<?>> messageConverters
     ) {
-        super(converters);
+        super(request);
         this.clientResponse = clientResponse;
         this.messageConverters.addAll(messageConverters);
         clientResponse.getHeaders().forEach(this::header);

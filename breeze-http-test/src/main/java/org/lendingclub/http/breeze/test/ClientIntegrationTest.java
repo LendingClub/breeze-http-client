@@ -22,6 +22,7 @@ import org.springframework.core.io.ClassPathResource;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.lang.reflect.Type;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -344,26 +345,24 @@ public class ClientIntegrationTest {
             );
 
             BreezeHttpRequest request = request(client, "/getMap/{pathVariable}", forceError, forceErrorParam);
-            BreezeHttpRawResponse response = request.get(BreezeHttpRawResponse.class);
+            BreezeHttpRawResponse raw = request.get(BreezeHttpRawResponse.class);
+            Type bodyType = new BreezeHttpType<Map<String, List<TestModel>>>() {}.type();
 
-            assertEquals("application/json;charset=UTF-8", response.header("content-type"));
-            assertNotNull(response.headers("date"));
+            assertEquals("application/json;charset=UTF-8", raw.header("content-type"));
+            assertNotNull(raw.headers("date"));
 
-            if (response.isSuccess()) {
-                assertEquals(200, response.httpStatus());
-                assertEquals(
-                        expected,
-                        response.convertResponse(new BreezeHttpType<Map<String, List<TestModel>>>() {}.type()).body()
-                );
-            } else if (response.isError()) {
-                BreezeHttpResponse<ErrorResponse> errorResponse = response.convertResponse(ErrorResponse.class);
+            if (raw.isSuccess()) {
+                assertEquals(200, raw.httpStatus());
+                assertEquals(expected, raw.toResponse(bodyType).body());
+            } else if (raw.isError()) {
+                BreezeHttpResponse<ErrorResponse> errorResponse = raw.toResponse(ErrorResponse.class);
                 ErrorResponse error = errorResponse.body();
-                assertEquals(response.httpStatus(), error.getCode());
-                assertEquals(response.isClientError() ? "clientError" : "serverError", error.getMessage());
+                assertEquals(raw.httpStatus(), error.getCode());
+                assertEquals(raw.isClientError() ? "clientError" : "serverError", error.getMessage());
             }
 
             try {
-                response.convertResponse(new BreezeHttpType<Map<String, List<TestModel>>>() {}.type());
+                raw.toResponse(bodyType);
                 fail("should not be able to read input stream twice");
             } catch (Exception e) {
                 // expected
@@ -381,25 +380,23 @@ public class ClientIntegrationTest {
 
             BreezeHttpRequest request = request(client, "/getMap/{pathVariable}", forceError, forceErrorParam);
             BreezeHttpRawResponse raw = request.method(GET).execute(null, BreezeHttpRawResponse.class);
+            Type bodyType = new BreezeHttpType<Map<String, List<TestModel>>>() {}.type();
 
             assertEquals("application/json;charset=UTF-8", raw.header("content-type"));
             assertNotNull(raw.headers("date"));
 
             if (raw.isSuccess()) {
                 assertEquals(200, raw.httpStatus());
-                assertEquals(
-                        expected,
-                        raw.convertResponse(new BreezeHttpType<Map<String, List<TestModel>>>() {}.type()).body()
-                );
+                assertEquals(expected, raw.toResponse(bodyType).body());
             } else if (raw.isError()) {
-                BreezeHttpResponse<ErrorResponse> errorResponse = raw.convertResponse(ErrorResponse.class);
+                BreezeHttpResponse<ErrorResponse> errorResponse = raw.toResponse(ErrorResponse.class);
                 ErrorResponse error = errorResponse.body();
                 assertEquals(raw.httpStatus(), error.getCode());
                 assertEquals(raw.isClientError() ? "clientError" : "serverError", error.getMessage());
             }
 
             try {
-                raw.convertResponse(new BreezeHttpType<Map<String, List<TestModel>>>() {}.type());
+                raw.toResponse(bodyType);
                 fail("should not be able to read input stream twice");
             } catch (Exception e) {
                 // expected

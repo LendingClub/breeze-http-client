@@ -144,7 +144,7 @@ public abstract class AbstractInvokingBreezeHttpClient extends AbstractBreezeHtt
             }
         }
 
-        return raw.convertResponse(request.conversionType());
+        return raw.toResponse();
     }
 
     protected void complete(BreezeHttpRequest request, BreezeHttpRawResponse raw, BreezeHttpResponse<?> response) {

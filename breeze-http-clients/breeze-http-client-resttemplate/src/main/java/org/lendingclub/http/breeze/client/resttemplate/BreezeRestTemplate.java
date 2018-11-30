@@ -55,11 +55,7 @@ public class BreezeRestTemplate extends RestTemplate implements BreezeHttpRestTe
             }
 
             httpEntityCallback(requestEntity, request.conversionType()).doWithRequest(httpRequest);
-            return new BreezeHttpRestTemplateRawResponse(
-                    request.breeze().converters(),
-                    httpRequest.execute(),
-                    getMessageConverters()
-            );
+            return new BreezeHttpRestTemplateRawResponse(request, httpRequest.execute(), getMessageConverters());
         } catch (IOException e) {
             throw new BreezeHttpException(e);
         }
