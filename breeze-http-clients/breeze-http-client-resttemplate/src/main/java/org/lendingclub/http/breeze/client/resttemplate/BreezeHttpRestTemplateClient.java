@@ -42,11 +42,11 @@ public class BreezeHttpRestTemplateClient extends AbstractInvokingBreezeHttpClie
     public BreezeHttpRestTemplateClient(
             BreezeHttpRestTemplate breezeTemplate,
             BreezeHttpRequestLogger requestLogger,
-            Collection<BreezeHttpConverter> converters,
             Collection<BreezeHttpFilter> filters,
+            Collection<BreezeHttpConverter> converters,
             BreezeHttpErrorHandler errorHandler
     ) {
-        super(requestLogger, converters, filters, errorHandler);
+        super(requestLogger, filters, converters, errorHandler);
         this.breezeTemplate = breezeTemplate != null ? breezeTemplate : new BreezeRestTemplate();
     }
 

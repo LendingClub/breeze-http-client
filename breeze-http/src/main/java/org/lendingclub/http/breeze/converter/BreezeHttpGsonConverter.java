@@ -1,7 +1,7 @@
 package org.lendingclub.http.breeze.converter;
 
-import org.lendingclub.http.breeze.client.json.BreezeHttpGsonMapper;
-import org.lendingclub.http.breeze.client.json.BreezeHttpJsonMapper;
+import org.lendingclub.http.breeze.json.BreezeHttpGsonMapper;
+import org.lendingclub.http.breeze.json.BreezeHttpJsonMapper;
 import org.lendingclub.http.breeze.request.BreezeHttpRequest;
 import org.lendingclub.http.breeze.response.BreezeHttpRawResponse;
 import org.lendingclub.http.breeze.response.BreezeHttpResponse;
@@ -10,22 +10,22 @@ import java.lang.reflect.Type;
 
 import com.google.gson.JsonElement;
 
-import static org.lendingclub.http.breeze.BreezeHttpType.isSubclass;
+import static org.lendingclub.http.breeze.type.BreezeHttpType.isSubclass;
 import static org.lendingclub.http.breeze.util.BreezeHttpUtil.cast;
 
-public class BreezeHttpGsonTypesConverter implements BreezeHttpConverter {
+public class BreezeHttpGsonConverter implements BreezeHttpConverter {
     protected final BreezeHttpJsonMapper gsonMapper;
 
-    public BreezeHttpGsonTypesConverter() {
+    public BreezeHttpGsonConverter() {
         this(new BreezeHttpGsonMapper());
     }
 
-    public BreezeHttpGsonTypesConverter(BreezeHttpJsonMapper gsonMapper) {
+    public BreezeHttpGsonConverter(BreezeHttpJsonMapper gsonMapper) {
         this.gsonMapper = gsonMapper;
     }
 
     @Override
-    public boolean convertRequestBody(BreezeHttpRequest request) {
+    public boolean convertBody(BreezeHttpRequest request) {
         Object body = request.body();
         if (body != null && isGsonElement(body.getClass())) {
             request.body(body.toString());
@@ -34,7 +34,7 @@ public class BreezeHttpGsonTypesConverter implements BreezeHttpConverter {
     }
 
     @Override
-    public <T> BreezeHttpResponse<T> convertResponse(BreezeHttpRawResponse raw, Type type) {
+    public <T> BreezeHttpResponse<T> toResponse(BreezeHttpRawResponse raw, Type type) {
         if (isGsonElement(type)) {
             return cast(new BreezeHttpResponse<>(gsonMapper.parse(raw.body()), raw));
         } else {

@@ -7,7 +7,7 @@ import org.lendingclub.http.breeze.response.BreezeHttpResponse;
 import java.lang.reflect.Type;
 
 public interface BreezeHttpConverter {
-    boolean convertRequestBody(BreezeHttpRequest request);
+    boolean convertBody(BreezeHttpRequest request);
 
-    <T> BreezeHttpResponse<T> convertResponse(BreezeHttpRawResponse raw, Type type);
+    <T> BreezeHttpResponse<T> toResponse(BreezeHttpRawResponse raw, Type type);
 }

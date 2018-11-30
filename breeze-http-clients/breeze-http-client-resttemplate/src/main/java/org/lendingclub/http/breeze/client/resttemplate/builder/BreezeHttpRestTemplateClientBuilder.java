@@ -45,8 +45,8 @@ public class BreezeHttpRestTemplateClientBuilder
         return decorate(new BreezeHttpRestTemplateClient(
                 breezeTemplate,
                 requestLogger,
-                converters,
                 filters,
+                converters,
                 errorHandler
         ));
     }

@@ -1,9 +1,9 @@
-package org.lendingclub.http.breeze.client.json;
+package org.lendingclub.http.breeze.json;
 
 import java.io.InputStream;
 import java.lang.reflect.Type;
 
-import static org.lendingclub.http.breeze.client.json.BreezeHttpMoshiMapper.IS_MOSHI_PRESENT;
+import static org.lendingclub.http.breeze.json.BreezeHttpMoshiMapper.IS_MOSHI_PRESENT;
 import static org.lendingclub.http.breeze.util.BreezeHttpUtil.IS_GSON_PRESENT;
 import static org.lendingclub.http.breeze.util.BreezeHttpUtil.IS_JACKSON_PRESENT;
 

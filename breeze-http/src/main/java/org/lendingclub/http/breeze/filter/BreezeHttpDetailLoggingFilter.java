@@ -1,9 +1,9 @@
 package org.lendingclub.http.breeze.filter;
 
-import org.lendingclub.http.breeze.client.json.BreezeHttpJsonMapper;
 import org.lendingclub.http.breeze.exception.BreezeHttpException;
 import org.lendingclub.http.breeze.exception.BreezeHttpExecutionException;
 import org.lendingclub.http.breeze.exception.BreezeHttpResponseException;
+import org.lendingclub.http.breeze.json.BreezeHttpJsonMapper;
 import org.lendingclub.http.breeze.request.BreezeHttpRequest;
 import org.lendingclub.http.breeze.request.body.BreezeHttpForm;
 import org.lendingclub.http.breeze.request.body.BreezeHttpMultipart;

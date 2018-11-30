@@ -1,4 +1,4 @@
-package org.lendingclub.http.breeze.client.json;
+package org.lendingclub.http.breeze.json;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;

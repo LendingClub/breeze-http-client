@@ -31,11 +31,11 @@ public abstract class BreezeHttpJaxRsClient extends AbstractInvokingBreezeHttpCl
 
     public BreezeHttpJaxRsClient(
             BreezeHttpRequestLogger requestLogger,
-            Collection<BreezeHttpConverter> converters,
             Collection<BreezeHttpFilter> filters,
+            Collection<BreezeHttpConverter> converters,
             BreezeHttpErrorHandler errorHandler
     ) {
-        super(requestLogger, converters, filters, errorHandler);
+        super(requestLogger, filters, converters, errorHandler);
     }
 
     protected abstract Client client();

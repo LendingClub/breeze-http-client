@@ -1,4 +1,4 @@
-package org.lendingclub.http.breeze.client.json;
+package org.lendingclub.http.breeze.json;
 
 import org.lendingclub.http.breeze.exception.BreezeHttpException;
 

@@ -20,8 +20,8 @@ import java.util.logging.Logger;
 public abstract class AbstractBreezeHttpClientBuilder<T> {
     protected T me;
     protected BreezeHttpRequestLogger requestLogger;
-    protected List<BreezeHttpConverter> converters = new ArrayList<>();
     protected List<BreezeHttpFilter> filters = new ArrayList<>();
+    protected List<BreezeHttpConverter> converters = new ArrayList<>();
     protected List<BreezeHttpDecorator> decorators = new ArrayList<>();
     protected BreezeHttpErrorHandler errorHandler;
 
@@ -35,16 +35,6 @@ public abstract class AbstractBreezeHttpClientBuilder<T> {
         return me;
     }
 
-    public T converter(BreezeHttpConverter converter) {
-        this.converters.add(converter);
-        return me;
-    }
-
-    public T converters(Collection<BreezeHttpConverter> converters) {
-        this.converters.addAll(converters);
-        return me;
-    }
-
     public T filter(BreezeHttpFilter filter) {
         this.filters.add(filter);
         return me;
@@ -52,6 +42,16 @@ public abstract class AbstractBreezeHttpClientBuilder<T> {
 
     public T filters(Collection<BreezeHttpFilter> filters) {
         this.filters.addAll(filters);
+        return me;
+    }
+
+    public T converter(BreezeHttpConverter converter) {
+        this.converters.add(converter);
+        return me;
+    }
+
+    public T converters(Collection<BreezeHttpConverter> converters) {
+        this.converters.addAll(converters);
         return me;
     }
 

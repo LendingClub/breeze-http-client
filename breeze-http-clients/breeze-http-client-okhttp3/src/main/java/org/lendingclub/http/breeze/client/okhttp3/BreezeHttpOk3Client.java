@@ -10,7 +10,6 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import okio.ByteString;
 import org.lendingclub.http.breeze.client.AbstractInvokingBreezeHttpClient;
-import org.lendingclub.http.breeze.client.json.BreezeHttpJsonMapper;
 import org.lendingclub.http.breeze.client.okhttp3.request.InputStreamRequestBody;
 import org.lendingclub.http.breeze.client.okhttp3.response.BreezeHttpOk3RawResponse;
 import org.lendingclub.http.breeze.converter.BreezeHttpConverter;
@@ -18,6 +17,7 @@ import org.lendingclub.http.breeze.error.BreezeHttpErrorHandler;
 import org.lendingclub.http.breeze.exception.BreezeHttpException;
 import org.lendingclub.http.breeze.exception.BreezeHttpExecutionException;
 import org.lendingclub.http.breeze.filter.BreezeHttpFilter;
+import org.lendingclub.http.breeze.json.BreezeHttpJsonMapper;
 import org.lendingclub.http.breeze.logging.BreezeHttpRequestLogger;
 import org.lendingclub.http.breeze.request.BreezeHttpRequest;
 import org.lendingclub.http.breeze.request.body.BreezeHttpForm;
@@ -45,12 +45,12 @@ public class BreezeHttpOk3Client extends AbstractInvokingBreezeHttpClient {
     public BreezeHttpOk3Client(
             OkHttpClient okClient,
             BreezeHttpRequestLogger requestLogger,
-            Collection<BreezeHttpConverter> converters,
             Collection<BreezeHttpFilter> filters,
+            Collection<BreezeHttpConverter> converters,
             BreezeHttpErrorHandler errorHandler,
             BreezeHttpJsonMapper jsonMapper
     ) {
-        super(requestLogger, converters, filters, errorHandler);
+        super(requestLogger, filters, converters, errorHandler);
         this.okClient = okClient != null ? okClient : new OkHttpClient();
         this.jsonMapper = jsonMapper != null ? jsonMapper : BreezeHttpJsonMapper.findMapper();
     }

@@ -7,7 +7,7 @@
     <parent>
         <artifactId>breeze-http-clients</artifactId>
         <groupId>org.lendingclub</groupId>
-        <version>1.0-SNAPSHOT</version>
+        <version>2.0.0</version>
     </parent>
 
     <artifactId>breeze-http-client-resttemplate</artifactId>
@@ -20,7 +20,7 @@
         <dependency>
             <groupId>org.lendingclub</groupId>
             <artifactId>breeze-http-client-okhttp3-builder</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>2.0.0</version>
             <scope>provided</scope>
         </dependency>
 
@@ -65,7 +65,7 @@
         <dependency>
             <groupId>org.lendingclub</groupId>
             <artifactId>breeze-http-test</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>2.0.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>

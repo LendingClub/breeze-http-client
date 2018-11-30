@@ -20,7 +20,7 @@ public abstract class BreezeHttpRawResponse extends BreezeHttpResponse<InputStre
 
     public <T> BreezeHttpResponse<T> toResponse(Type type) {
         return request.breeze().converters().stream()
-                .<BreezeHttpResponse<T>>map(converter -> converter.convertResponse(this, type))
+                .<BreezeHttpResponse<T>>map(converter -> converter.toResponse(this, type))
                 .filter(Objects::nonNull)
                 .findFirst()
                 .orElseGet(() -> new BreezeHttpResponse<>(convertBody(type), this));

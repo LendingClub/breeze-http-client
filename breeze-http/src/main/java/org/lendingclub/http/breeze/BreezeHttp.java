@@ -8,6 +8,7 @@ import org.lendingclub.http.breeze.filter.BreezeHttpFilter;
 import org.lendingclub.http.breeze.logging.BreezeHttpRequestLogger;
 import org.lendingclub.http.breeze.request.BreezeHttpRequest;
 import org.lendingclub.http.breeze.request.BreezeHttpRequest.Method;
+import org.lendingclub.http.breeze.type.BreezeHttpType;
 
 import java.net.URL;
 import java.util.List;
@@ -209,11 +210,11 @@ public interface BreezeHttp {
     /** The error handler to invoke when an HTTP response has a status in the exception statuses. */
     BreezeHttpErrorHandler errorHandler();
 
-    /** List of body converters configured for this client. */
-    List<BreezeHttpConverter> converters();
-
     /** List of request filters configured for this client. */
     List<BreezeHttpFilter> filters();
+
+    /** List of body converters configured for this client. */
+    List<BreezeHttpConverter> converters();
 
     /** Return a decorated instance of this BreezeHttp object with the given decorator. */
     BreezeHttp decorate(BreezeHttpDecorator decorator);

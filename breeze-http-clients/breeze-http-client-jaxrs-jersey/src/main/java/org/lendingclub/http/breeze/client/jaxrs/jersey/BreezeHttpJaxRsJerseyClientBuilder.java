@@ -23,8 +23,8 @@ public class BreezeHttpJaxRsJerseyClientBuilder
         return decorate(new BreezeHttpJaxRsJerseyClient(
                 client,
                 requestLogger,
-                converters,
                 filters,
+                converters,
                 errorHandler
         ));
     }

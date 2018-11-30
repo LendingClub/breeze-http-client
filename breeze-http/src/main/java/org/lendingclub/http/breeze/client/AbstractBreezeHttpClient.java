@@ -1,11 +1,11 @@
 package org.lendingclub.http.breeze.client;
 
 import org.lendingclub.http.breeze.BreezeHttp;
-import org.lendingclub.http.breeze.BreezeHttpType;
 import org.lendingclub.http.breeze.decorator.BreezeHttpDecorator;
 import org.lendingclub.http.breeze.request.BreezeHttpRequest;
 import org.lendingclub.http.breeze.request.BreezeHttpRequest.Method;
 import org.lendingclub.http.breeze.response.BreezeHttpResponse;
+import org.lendingclub.http.breeze.type.BreezeHttpType;
 
 import java.net.URL;
 import java.util.List;

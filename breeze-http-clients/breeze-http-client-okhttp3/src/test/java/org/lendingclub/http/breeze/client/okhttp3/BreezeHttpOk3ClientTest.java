@@ -2,12 +2,12 @@ package org.lendingclub.http.breeze.client.okhttp3;
 
 import okhttp3.OkHttpClient;
 import org.junit.runner.RunWith;
-import org.lendingclub.http.breeze.client.json.BreezeHttpGsonMapper;
-import org.lendingclub.http.breeze.client.json.BreezeHttpJacksonMapper;
-import org.lendingclub.http.breeze.client.json.BreezeHttpMoshiMapper;
 import org.lendingclub.http.breeze.client.okhttp3.builder.BreezeHttpOk3ClientBuilder;
 import org.lendingclub.http.breeze.client.okhttp3.builder.BreezeOkHttpClient3Builder;
 import org.lendingclub.http.breeze.decorator.BreezeHttpRequestDefaultsDecorator;
+import org.lendingclub.http.breeze.json.BreezeHttpGsonMapper;
+import org.lendingclub.http.breeze.json.BreezeHttpJacksonMapper;
+import org.lendingclub.http.breeze.json.BreezeHttpMoshiMapper;
 import org.lendingclub.http.breeze.test.ClientIntegrationTest;
 import org.lendingclub.http.breeze.test.ClientTestApplication;
 import org.lendingclub.http.breeze.test.ErrorResponse;

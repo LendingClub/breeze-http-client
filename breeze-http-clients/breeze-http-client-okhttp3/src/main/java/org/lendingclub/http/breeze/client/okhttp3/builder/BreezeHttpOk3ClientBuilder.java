@@ -3,8 +3,8 @@ package org.lendingclub.http.breeze.client.okhttp3.builder;
 import okhttp3.OkHttpClient;
 import org.lendingclub.http.breeze.BreezeHttp;
 import org.lendingclub.http.breeze.builder.AbstractBreezeHttpClientBuilder;
-import org.lendingclub.http.breeze.client.json.BreezeHttpJsonMapper;
 import org.lendingclub.http.breeze.client.okhttp3.BreezeHttpOk3Client;
+import org.lendingclub.http.breeze.json.BreezeHttpJsonMapper;
 
 public class BreezeHttpOk3ClientBuilder extends AbstractBreezeHttpClientBuilder<BreezeHttpOk3ClientBuilder> {
     protected OkHttpClient okClient;
@@ -29,8 +29,8 @@ public class BreezeHttpOk3ClientBuilder extends AbstractBreezeHttpClientBuilder<
         return decorate(new BreezeHttpOk3Client(
                 okClient,
                 requestLogger,
-                converters,
                 filters,
+                converters,
                 errorHandler,
                 jsonMapper
         ));

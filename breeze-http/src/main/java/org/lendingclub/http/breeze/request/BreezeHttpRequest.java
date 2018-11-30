@@ -1,7 +1,6 @@
 package org.lendingclub.http.breeze.request;
 
 import org.lendingclub.http.breeze.BreezeHttp;
-import org.lendingclub.http.breeze.BreezeHttpType;
 import org.lendingclub.http.breeze.decorator.DecoratedBreezeHttp;
 import org.lendingclub.http.breeze.exception.BreezeHttpException;
 import org.lendingclub.http.breeze.filter.BreezeHttpFilter;
@@ -11,6 +10,7 @@ import org.lendingclub.http.breeze.request.body.builder.MapRequestBodyBuilder;
 import org.lendingclub.http.breeze.request.body.builder.MultipartRequestBodyBuilder;
 import org.lendingclub.http.breeze.response.BreezeHttpRawResponse;
 import org.lendingclub.http.breeze.response.BreezeHttpResponse;
+import org.lendingclub.http.breeze.type.BreezeHttpType;
 
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
@@ -21,9 +21,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static org.lendingclub.http.breeze.BreezeHttpType.firstTypeArgument;
-import static org.lendingclub.http.breeze.BreezeHttpType.isSubclass;
-import static org.lendingclub.http.breeze.BreezeHttpType.rawType;
+import static org.lendingclub.http.breeze.type.BreezeHttpType.firstTypeArgument;
+import static org.lendingclub.http.breeze.type.BreezeHttpType.isSubclass;
+import static org.lendingclub.http.breeze.type.BreezeHttpType.rawType;
 import static org.lendingclub.http.breeze.util.BreezeHttpUtil.decode;
 import static org.lendingclub.http.breeze.util.BreezeHttpUtil.quote;
 

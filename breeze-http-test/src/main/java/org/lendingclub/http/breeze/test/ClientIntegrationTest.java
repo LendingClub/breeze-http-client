@@ -2,7 +2,6 @@ package org.lendingclub.http.breeze.test;
 
 import org.junit.Test;
 import org.lendingclub.http.breeze.BreezeHttp;
-import org.lendingclub.http.breeze.BreezeHttpType;
 import org.lendingclub.http.breeze.decorator.BreezeHttpRequestDefaultsDecorator;
 import org.lendingclub.http.breeze.decorator.BreezeHttpRetryDecorator;
 import org.lendingclub.http.breeze.exception.BreezeHttpClientErrorException;
@@ -15,6 +14,7 @@ import org.lendingclub.http.breeze.filter.BreezeHttpFilter;
 import org.lendingclub.http.breeze.request.BreezeHttpRequest;
 import org.lendingclub.http.breeze.response.BreezeHttpRawResponse;
 import org.lendingclub.http.breeze.response.BreezeHttpResponse;
+import org.lendingclub.http.breeze.type.BreezeHttpType;
 import org.lendingclub.http.breeze.util.BreezeHttpUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

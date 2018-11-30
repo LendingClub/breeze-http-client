@@ -1,9 +1,9 @@
 package org.lendingclub.http.breeze.client;
 
 import org.lendingclub.http.breeze.converter.BreezeHttpConverter;
-import org.lendingclub.http.breeze.converter.BreezeHttpGsonTypesConverter;
-import org.lendingclub.http.breeze.converter.BreezeHttpJacksonTypesConverter;
-import org.lendingclub.http.breeze.converter.BreezeHttpJsonPathTypesConverter;
+import org.lendingclub.http.breeze.converter.BreezeHttpGsonConverter;
+import org.lendingclub.http.breeze.converter.BreezeHttpJacksonConverter;
+import org.lendingclub.http.breeze.converter.BreezeHttpJsonPathConverter;
 import org.lendingclub.http.breeze.error.BreezeHttpErrorHandler;
 import org.lendingclub.http.breeze.error.DefaultBreezeHttpErrorHandler;
 import org.lendingclub.http.breeze.exception.BreezeHttpExecutionException;
@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static org.lendingclub.http.breeze.BreezeHttpType.isSubclass;
+import static org.lendingclub.http.breeze.type.BreezeHttpType.isSubclass;
 import static org.lendingclub.http.breeze.util.BreezeHttpUtil.IS_GSON_PRESENT;
 import static org.lendingclub.http.breeze.util.BreezeHttpUtil.IS_JACKSON_PRESENT;
 import static org.lendingclub.http.breeze.util.BreezeHttpUtil.IS_JSON_PATH_PRESENT;
@@ -30,33 +30,33 @@ import static org.lendingclub.http.breeze.util.BreezeHttpUtil.simpleName;
 
 public abstract class AbstractInvokingBreezeHttpClient extends AbstractBreezeHttpClient {
     protected final BreezeHttpRequestLogger requestLogger;
-    protected final List<BreezeHttpConverter> converters = new ArrayList<>();
     protected final List<BreezeHttpFilter> filters = new ArrayList<>();
+    protected final List<BreezeHttpConverter> converters = new ArrayList<>();
     protected final BreezeHttpErrorHandler errorHandler;
 
     public AbstractInvokingBreezeHttpClient(
             BreezeHttpRequestLogger requestLogger,
-            Collection<BreezeHttpConverter> converters,
             Collection<BreezeHttpFilter> filters,
+            Collection<BreezeHttpConverter> converters,
             BreezeHttpErrorHandler errorHandler
     ) {
         this.requestLogger = requestLogger != null ? requestLogger : new DefaultBreezeHttpRequestLogger();
+
+        if (filters != null) {
+            this.filters.addAll(filters);
+        }
 
         if (converters != null) {
             this.converters.addAll(converters);
         }
         if (IS_GSON_PRESENT) {
-            this.converters.add(new BreezeHttpGsonTypesConverter());
+            this.converters.add(new BreezeHttpGsonConverter());
         }
         if (IS_JACKSON_PRESENT) {
-            this.converters.add(new BreezeHttpJacksonTypesConverter());
+            this.converters.add(new BreezeHttpJacksonConverter());
         }
         if (IS_JSON_PATH_PRESENT) {
-            this.converters.add(new BreezeHttpJsonPathTypesConverter());
-        }
-
-        if (filters != null) {
-            this.filters.addAll(filters);
+            this.converters.add(new BreezeHttpJsonPathConverter());
         }
 
         this.errorHandler = errorHandler != null ? errorHandler : new DefaultBreezeHttpErrorHandler();
@@ -122,7 +122,7 @@ public abstract class AbstractInvokingBreezeHttpClient extends AbstractBreezeHtt
         }
 
         for (BreezeHttpConverter converter : converters) {
-            if (!converter.convertRequestBody(request)) {
+            if (!converter.convertBody(request)) {
                 break;
             }
         }

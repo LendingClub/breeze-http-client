@@ -31,11 +31,11 @@ public class BreezeHttpJaxRsJerseyClient extends BreezeHttpJaxRsClient {
     public BreezeHttpJaxRsJerseyClient(
             Client client,
             BreezeHttpRequestLogger requestLogger,
-            Collection<BreezeHttpConverter> converters,
             Collection<BreezeHttpFilter> filters,
+            Collection<BreezeHttpConverter> converters,
             BreezeHttpErrorHandler errorHandler
     ) {
-        super(requestLogger, converters, filters, errorHandler);
+        super(requestLogger, filters, converters, errorHandler);
         this.client = client == null ? JerseyClientBuilder.createClient() : client;
     }
 

@@ -1,8 +1,8 @@
 package org.lendingclub.http.breeze.request.body.builder;
 
-import org.lendingclub.http.breeze.BreezeHttpType;
 import org.lendingclub.http.breeze.exception.BreezeHttpException;
 import org.lendingclub.http.breeze.request.BreezeHttpRequest;
+import org.lendingclub.http.breeze.type.BreezeHttpType;
 
 public abstract class AbstractRequestBodyBuilder<B> {
     protected final BreezeHttpRequest request;

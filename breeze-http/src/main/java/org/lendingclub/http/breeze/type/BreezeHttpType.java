@@ -1,4 +1,4 @@
-package org.lendingclub.http.breeze;
+package org.lendingclub.http.breeze.type;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;

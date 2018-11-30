@@ -1,7 +1,7 @@
 package org.lendingclub.http.breeze.converter;
 
-import org.lendingclub.http.breeze.client.json.BreezeHttpJacksonMapper;
-import org.lendingclub.http.breeze.client.json.BreezeHttpJsonMapper;
+import org.lendingclub.http.breeze.json.BreezeHttpJacksonMapper;
+import org.lendingclub.http.breeze.json.BreezeHttpJsonMapper;
 import org.lendingclub.http.breeze.request.BreezeHttpRequest;
 import org.lendingclub.http.breeze.response.BreezeHttpRawResponse;
 import org.lendingclub.http.breeze.response.BreezeHttpResponse;
@@ -10,22 +10,22 @@ import java.lang.reflect.Type;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import static org.lendingclub.http.breeze.BreezeHttpType.isSubclass;
+import static org.lendingclub.http.breeze.type.BreezeHttpType.isSubclass;
 import static org.lendingclub.http.breeze.util.BreezeHttpUtil.cast;
 
-public class BreezeHttpJacksonTypesConverter implements BreezeHttpConverter {
+public class BreezeHttpJacksonConverter implements BreezeHttpConverter {
     protected final BreezeHttpJsonMapper jacksonMapper;
 
-    public BreezeHttpJacksonTypesConverter() {
+    public BreezeHttpJacksonConverter() {
         this(new BreezeHttpJacksonMapper());
     }
 
-    public BreezeHttpJacksonTypesConverter(BreezeHttpJsonMapper jacksonMapper) {
+    public BreezeHttpJacksonConverter(BreezeHttpJsonMapper jacksonMapper) {
         this.jacksonMapper = jacksonMapper;
     }
 
     @Override
-    public boolean convertRequestBody(BreezeHttpRequest request) {
+    public boolean convertBody(BreezeHttpRequest request) {
         Object body = request.body();
         if (body != null && isJacksonNode(body.getClass())) {
             request.body(body.toString());
@@ -34,7 +34,7 @@ public class BreezeHttpJacksonTypesConverter implements BreezeHttpConverter {
     }
 
     @Override
-    public <T> BreezeHttpResponse<T> convertResponse(BreezeHttpRawResponse raw, Type type) {
+    public <T> BreezeHttpResponse<T> toResponse(BreezeHttpRawResponse raw, Type type) {
         if (isJacksonNode(type)) {
             return cast(new BreezeHttpResponse<>(jacksonMapper.parse(raw.body()), raw));
         } else {
